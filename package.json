@@ -13,6 +13,8 @@
     "url": "https://gitlab.com/swan-io/mobile"
   },
   "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
     "postinstall": "yarn generate-env",
     "android:bind": "adb reverse tcp:8081 tcp:8081",
     "android:build-debug": "yarn android:gradle bundleDebug",
