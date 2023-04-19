@@ -1,0 +1,18 @@
+{
+  "authenticationScreen.signInButton": "Sign in",
+  "cardDetailsScreen.descriptionEnd": "to use it immediately.",
+  "cardDetailsScreen.descriptionStart": "Add you card to",
+  "cardDetailsScreen.laterButton": "Later",
+  "cardListScreen.addCardButton": "Add to {serviceName}",
+  "cardListScreen.alreadyAdded": "Already in {serviceName}",
+  "cardListScreen.cannotBeAdded": "Cannot be added",
+  "cardListScreen.description": "Here are your Swan cards. Add them to {serviceName} to use them directly from your device.",
+  "cardListScreen.noCardMessage": "No card found",
+  "cardListScreen.noWalletUsageMessage": "Can't access wallet",
+  "cardListScreen.showCardButton": "Show in {serviceName}",
+  "cardListScreen.title": "Cards",
+  "error.generic": "An error occurred",
+  "errorView.logoutButton": "Logout",
+  "errorView.text": "Something went wrong",
+  "logoutButton.text": "Logout"
+}

@@ -1,0 +1,18 @@
+{
+  "authenticationScreen.signInButton": "Iniciar sessão",
+  "cardDetailsScreen.descriptionEnd": "para usá-lo imediatamente.",
+  "cardDetailsScreen.descriptionStart": "Adicione o seu cartão a",
+  "cardDetailsScreen.laterButton": "Mais tarde",
+  "cardListScreen.addCardButton": "Adicionar a {serviceName}",
+  "cardListScreen.alreadyAdded": "Já está em {serviceName}",
+  "cardListScreen.cannotBeAdded": "Não pode ser adicionado",
+  "cardListScreen.description": "Aqui estão os seus cartões Swan. Adicione-os a {serviceName} para usá-los diretamente do seu dispositivo.",
+  "cardListScreen.noCardMessage": "Nenhum cartão encontrado",
+  "cardListScreen.noWalletUsageMessage": "Não é possível aceder a carteira digital",
+  "cardListScreen.showCardButton": "Mostrado em {serviceName}",
+  "cardListScreen.title": "Cartões",
+  "error.generic": "Ocorreu um erro",
+  "errorView.logoutButton": "Terminar sessão",
+  "errorView.text": "Algo correu mal",
+  "logoutButton.text": "Terminar sessão"
+}

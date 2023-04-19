@@ -1,0 +1,29 @@
+{
+  "include": ["src"],
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2018",
+    "lib": ["ESNext"],
+    "moduleResolution": "Node",
+    "outDir": "dist",
+
+    "allowJs": false,
+    "strict": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "incremental": true,
+    "esModuleInterop": true,
+
+    "declaration": true,
+    "noEmitOnError": true,
+    "pretty": true,
+    "sourceMap": true,
+
+    "allowSyntheticDefaultImports": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

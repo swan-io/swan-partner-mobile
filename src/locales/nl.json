@@ -1,0 +1,18 @@
+{
+  "authenticationScreen.signInButton": "Aanmelden",
+  "cardDetailsScreen.descriptionEnd": "om het direct te gebruiken.",
+  "cardDetailsScreen.descriptionStart": "Voeg je kaart toe aan",
+  "cardDetailsScreen.laterButton": "Later",
+  "cardListScreen.addCardButton": "Toevoegen aan {serviceName}",
+  "cardListScreen.alreadyAdded": "Reeds in {serviceName}",
+  "cardListScreen.cannotBeAdded": "Kan niet toegevoegd worden",
+  "cardListScreen.description": "Hier zijn je Swan-kaarten. Voeg ze toe aan {serviceName} om ze direct vanaf je apparaat te gebruiken.",
+  "cardListScreen.noCardMessage": "Geen kaart gevonden",
+  "cardListScreen.noWalletUsageMessage": "Geen toegang tot wallet",
+  "cardListScreen.showCardButton": "Tonen in {serviceName}",
+  "cardListScreen.title": "Kaarten",
+  "error.generic": "Er ging iets fout",
+  "errorView.logoutButton": "Uitloggen",
+  "errorView.text": "Er ging iets fout",
+  "logoutButton.text": "Uitloggen"
+}
