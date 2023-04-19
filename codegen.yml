@@ -1,0 +1,54 @@
+errorsOnly: true
+overwrite: true
+
+hooks:
+  afterAllFileWrite:
+    - "prettier --write"
+
+generates:
+  ./src/graphql/index.tsx:
+    schema: "./src/graphql/schema.gql"
+    documents: "./src/graphql/**/*.gql"
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typed-document-node"
+      - "typescript-urql-graphcache"
+    config:
+      dedupeOperationSuffix: true
+      enumsAsTypes: true
+      preResolveTypes: true
+      skipTypename: false
+      nonOptionalTypename: true
+      inlineFragmentTypes: combine
+      scalars:
+        AccountNumber: string
+        AmountValue: string
+        BIC: string
+        CCA2: string
+        CCA3: string
+        Currency: string
+        Date: string
+        DateTime: string
+        EmailAddress: string
+        HexColorCode: string
+        IBAN: string
+        PIN: string
+        PhoneNumber: string
+        PostalCode: string
+        SepaCreditorIdentifier: string
+        SepaReference: string
+        URL: string
+        Upload: unknown
+        WalletToken: string
+
+  ./src/graphql/introspection.json:
+    schema:
+      - "./src/graphql/schema.gql"
+    plugins:
+      - "introspection"
+    config:
+      descriptions: false
+    hooks:
+      afterOneFileWrite:
+        - "yarn tsx ./scripts/cleanIntrospection.ts"

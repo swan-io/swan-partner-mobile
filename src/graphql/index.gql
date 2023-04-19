@@ -1,0 +1,118 @@
+query CardList(
+  $first: Int!
+  $after: String
+  $filters: CardFiltersInput
+  $orderBy: CardOrderByInput
+) {
+  projectInfo {
+    id
+    logoUri
+    name
+  }
+
+  cards(first: $first, after: $after, filters: $filters, orderBy: $orderBy) {
+    totalCount
+
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+
+    edges {
+      node {
+        cardDesignUrl
+        cardMaskedNumber
+        id
+        statusInfo {
+          status
+        }
+        cardProduct {
+          id
+          cardDesigns {
+            id
+            cardDesignUrl
+            cardBackground {
+              id
+              cardTextColor
+            }
+          }
+        }
+        accountMembership {
+          id
+          account {
+            id
+            number
+          }
+          statusInfo {
+            status
+          }
+          user {
+            id
+            firstName
+            lastName
+          }
+        }
+      }
+    }
+  }
+
+  user {
+    id
+  }
+}
+
+mutation AddDigitalCard($input: AddDigitalCardInput!) {
+  addDigitalCard(input: $input) {
+    __typename
+
+    ... on AddDigitalCardSuccessPayload {
+      digitalCard {
+        id
+
+        statusInfo {
+          status
+          ... on DigitalCardConsentPendingStatusInfo {
+            consent {
+              id
+              consentUrl
+            }
+          }
+        }
+      }
+    }
+    ... on Rejection {
+      message
+    }
+  }
+}
+
+query GetDigitalCardsEncryptedInfo(
+  $cardId: ID!
+  $filters: DigitalCardFiltersInput!
+  $signatureData: SignatureData
+) {
+  card(cardId: $cardId) {
+    id
+    digitalCards(filters: $filters) {
+      edges {
+        node {
+          id
+          ... on PendingDigitalCard {
+            id
+            statusInfo {
+              status
+            }
+            inAppProvisioningData(signatureData: $signatureData) {
+              activationData
+              encryptedData
+              ephemeralPublicKey
+              iv
+              oaepHashingAlgorithm
+              publicKeyFingerprint
+            }
+          }
+        }
+      }
+    }
+  }
+}

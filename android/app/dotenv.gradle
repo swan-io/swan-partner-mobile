@@ -1,0 +1,35 @@
+// Based on https://github.com/luggit/react-native-config/blob/master/android/dotenv.gradle
+
+def parseEnv(fileName) {
+    def output = [:]
+    File file = new File("$project.rootDir/../$fileName")
+
+    if (file.isFile()) {
+        println("Reading environment variables from $fileName")
+
+        file.eachLine { line ->
+            def matcher = (line =~ /^\s*(?:export\s+|)([\w\d\.\-_]+)\s*=\s*['"]?(.*?)?['"]?\s*$/)
+
+            if (matcher.getCount() == 1 && matcher[0].size() == 3) {
+                output.put(matcher[0][1], matcher[0][2].replace('"', '\\"'))
+            }
+        }
+    } else {
+        println("No $fileName file found. Skipping…")
+    }
+
+    return output
+}
+
+project.ext.set("buildEnv", parseEnv(".env.build"))
+project.ext.set("env", parseEnv(".env"))
+
+android {
+    defaultConfig {
+        project.env.each { k, v ->
+            def escaped = v.replaceAll("%","\\\\u0025")
+            buildConfigField "String", k, "\"$v\""
+            resValue "string", k, "\"$escaped\""
+        }
+    }
+}
