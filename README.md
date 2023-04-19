@@ -2,6 +2,8 @@
 
 A demo of a Swan integration within a native app, built with React Native.
 
+📘 [Documentation](https://docs.swan.io/api/consent/integrate-strong-customer-authentication-sca)
+
 ## Getting started
 
 First, besure that you correctly setted up your development environment. We recommend following [this guide](https://reactnative.dev/docs/environment-setup).<br/>
