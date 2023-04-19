@@ -10,7 +10,7 @@ You will also need to install [yarn](https://classic.yarnpkg.com/en/docs/install
 ### Clone
 
 ```bash
-$ git clone git@github.com:swan-io/lake.git
+$ git clone git@github.com/swan-io/swan-partner-mobile.git
 ```
 
 ### Install
