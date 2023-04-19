@@ -32,6 +32,7 @@ local.properties
 *.hprof
 .cxx/
 *.keystore
+!debug.keystore
 
 # Visual Studio Code
 #
