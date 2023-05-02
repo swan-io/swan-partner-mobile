@@ -80,6 +80,9 @@ tsconfig.tsbuildinfo
 .env.build
 src/types/react-native-dotenv.d.ts
 
+# Localazy keys
+localazy.keys.json
+
 # GraphQL generated files
 src/graphql/**/*.json
 src/graphql/**/*.ts

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/localazy/cli-schema/master/localazy.json",
+
+  "upload": {
+    "type": "json",
+    "importAsNew": true,
+    "deprecateMissing": true,
+
+    "files": [
+      {
+        "lang": "en",
+        "pattern": "src/locales/en.json"
+      },
+      {
+        "lang": "de",
+        "pattern": "src/locales/de.json"
+      },
+      {
+        "lang": "es",
+        "pattern": "src/locales/es.json"
+      },
+      {
+        "lang": "fr",
+        "pattern": "src/locales/fr.json"
+      },
+      {
+        "lang": "it",
+        "pattern": "src/locales/it.json"
+      },
+      {
+        "lang": "nl",
+        "pattern": "src/locales/nl.json"
+      },
+      {
+        "lang": "pt",
+        "pattern": "src/locales/pt.json"
+      }
+    ]
+  },
+
+  "download": {
+    "includeSourceLang": true,
+    "files": [
+      {
+        "output": "src/locales/${lang}.json"
+      }
+    ]
+  }
+}
