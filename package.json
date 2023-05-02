@@ -36,6 +36,7 @@
     "start": "yarn generate-env && react-native start",
     "cold-start": "yarn generate-env && react-native start --reset-cache",
     "format": "prettier '**/*' -u -w",
+    "format-locales": "tsx ./scripts/sortTranslations.ts",
     "lint": "yarn generate-env && eslint ./src --ext ts,tsx",
     "typecheck": "yarn generate-env && tsc --noEmit"
   },
