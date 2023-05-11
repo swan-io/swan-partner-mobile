@@ -12,12 +12,7 @@
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
-
-  [super application:application didFinishLaunchingWithOptions:launchOptions];
-  UIView *rootView = self.window.rootViewController.view;
-  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
-
-  return YES;
+  return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
@@ -29,9 +24,14 @@
 #endif
 }
 
-- (BOOL)application:(UIApplication *)application
-  openURL:(NSURL *)url
-  options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+- (UIView *)createRootViewWithBridge:(RCTBridge *)bridge moduleName:(NSString *)moduleName initProps:(NSDictionary *)initProps
+{
+  UIView *rootView = [super createRootViewWithBridge:bridge moduleName:moduleName initProps:initProps];
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+  return rootView;
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
   return [RCTLinkingManager application:application openURL:url options:options];
 }
@@ -40,9 +40,7 @@
   continueUserActivity:(nonnull NSUserActivity *)userActivity
   restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
 {
-  return [RCTLinkingManager application:application
-                   continueUserActivity:userActivity
-                     restorationHandler:restorationHandler];
+  return [RCTLinkingManager application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
 }
 
 /// This method controls whether the `concurrentRoot`feature of React18 is turned on or off.
