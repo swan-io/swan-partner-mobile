@@ -24,7 +24,7 @@ export type TranslationKey = keyof typeof translationEN;
 const translationsKeys = Object.keys(translations) as SupportedLanguage[];
 
 export const language: SupportedLanguage =
-  RNLocalize.findBestAvailableLanguage(translationsKeys)?.languageTag ?? LANGUAGE_FALLBACK;
+  RNLocalize.findBestLanguageTag(translationsKeys)?.languageTag ?? LANGUAGE_FALLBACK;
 
 const intl = createIntl(
   {
