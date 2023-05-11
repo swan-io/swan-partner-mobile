@@ -606,6 +606,11 @@ type AccountHolderCompanyInfo implements AccountHolderInfo {
   registrationNumber: String
 
   """
+  Registration date of the company.
+  """
+  companyRegistrationDate: Date
+
+  """
   Legal form of the company (SAS, SCI, SASU, ...).
   """
   companyType: CompanyType
@@ -4839,11 +4844,6 @@ type CheckTransaction implements Transaction {
   paymentProduct: PaymentProduct!
 
   """
-  creditor information
-  """
-  creditor: InternalDirectDebitCreditor!
-
-  """
   matching account for the transaction
   """
   account: Account
@@ -5627,7 +5627,7 @@ input CreditTransferInput {
   externalReference: String
 
   """
-  *SOON TO BE DEPRECATED*
+  *DEPRECATED*
   if the transfer will execute as instant
   """
   isInstant: Boolean
@@ -5636,6 +5636,12 @@ input CreditTransferInput {
   if the transfer will execute as instant and fallbacked to a regular one if an error happend during the instant transfer
   """
   mode: CreditTransferMode
+
+  """
+  *COMING SOON*
+  if the transfer will credit a new international beneficiary
+  """
+  internationalBeneficiary: InternationalBeneficiaryInput
 }
 
 enum CreditTransferMode {
@@ -7392,6 +7398,26 @@ enum IdentificationLevel {
 }
 
 """
+User identification levels input payload.
+"""
+enum IdentificationLevelInput {
+  """
+  Identity verified by an expert (Ubble-like)
+  """
+  Expert
+
+  """
+  Identity verified by an expert with a Remote Identity Verification Service
+  """
+  PVID
+
+  """
+  Identity verified by an expert and a Qualified Electronic Signature has been done
+  """
+  QES
+}
+
+"""
 Identification levels
 """
 type IdentificationLevels {
@@ -7774,6 +7800,7 @@ input InitiateFundingRequestInput {
   requestedExecutionAt: DateTime
 
   """
+  *SOON TO BE DEPRECATED*
   If `true` the funds should be available immediately. If `false` or `null`, the funds will be available
   after the resolution of the credit transaction.
   """
@@ -8686,6 +8713,16 @@ enum InternalReceivedDirectDebitMandateSequence {
 }
 
 """
+International beneficiary account
+"""
+input InternationalBeneficiaryInput {
+  """
+  Currency of the international beneficiary
+  """
+  currency: Currency!
+}
+
+"""
 Rejection returned on invalid argument error
 """
 type InvalidArgumentRejection implements Rejection {
@@ -8770,6 +8807,11 @@ type Invoice {
   unique id
   """
   id: ID!
+
+  """
+  account id
+  """
+  accountId: ID!
 
   """
   name of the invoice
@@ -11696,22 +11738,37 @@ type PhysicalCardConsentPendingStatusInfo implements PhysicalCardStatusInfo {
 input PhysicalCardCustomOptionsForGroupDeliveryInput {
   """
   Additional line to be embossed on the card.
+
+  This field will only be taken into account for custom card design that include it. ([Learn More](https://docs.swan.io/guide/issue-cards#order-cards-with-additional-line))
+
+  Max length allowed: 26 characters.
+  Characters allowed: alphanumeric’*’ ‘.’ ‘-’ ‘/’ apostrophe
   """
-  additionalEmbossedLine: String
+  additionalPrintedLine: String
 }
 
 input PhysicalCardCustomOptionsForPrintInput {
   """
-  Additional line to be embossed on the card.
+  Additional line to be printed on the card.
+
+  This field will only be taken into account for custom card design that include it. ([Learn More](https://docs.swan.io/guide/issue-cards#order-cards-with-additional-line))
+
+  Max length allowed: 26 characters.
+  Characters allowed: alphanumeric’*’ ‘.’ ‘-’ ‘/’ apostrophe
   """
-  additionalEmbossedLine: String
+  additionalPrintedLine: String
 }
 
 input PhysicalCardCustomOptionsInput {
   """
   Additional line to be embossed on the card.
+
+  This field will only be taken into account for custom card design that include it. ([Learn More](https://docs.swan.io/guide/issue-cards#order-cards-with-additional-line))
+
+  Max length allowed: 26 characters.
+  Characters allowed: alphanumeric’*’ ‘.’ ‘-’ ‘/’ apostrophe
   """
-  additionalEmbossedLine: String
+  additionalPrintedLine: String
 }
 
 """
@@ -12280,7 +12337,7 @@ type Query {
 
   *This query is restricted to a Project access token ([Learn More](https://docs.swan.io/api/authentication))*
   """
-  users(first: Int! = 50, after: String): UserConnection!
+  users(after: String, before: String, filters: UserFilterInput, first: Int! = 50): UserConnection!
 
   """
   Returns the project infos you set in the dashboard.
@@ -12321,6 +12378,7 @@ type Query {
   Return the Shareholder for the provided id.
   """
   shareholder(id: ID!): Shareholder
+  accountInvoice(invoiceId: ID!): Invoice
 
   """
   Returns an account statement by id
@@ -16535,6 +16593,11 @@ enum TransactionTypeEnum {
   When a Check credited a Swan account.
   """
   CheckIn
+
+  """
+  When a Check credited a Swan account and Swan or the debtor returned the funds.
+  """
+  CheckInReturn
 }
 
 """
@@ -17330,6 +17393,11 @@ type User {
   updatedAt: DateTime!
 
   """
+  Date on which the user joined the project. Joining the project is done after the first accepted OAuth login.
+  """
+  joinedAt: DateTime!
+
+  """
   The list of account memberships
   """
   accountMemberships(
@@ -17392,6 +17460,16 @@ type UserEdge implements Edge {
   node: User!
 }
 
+input UserFilterInput {
+  birthDate: Date
+  firstName: String
+  identificationLevel: IdentificationLevelInput
+  lastName: String
+  mobilePhoneNumber: String
+  nationalityCCA3: CCA3
+  preferredNotificationChannel: PreferredNotificationChannel
+}
+
 type UserNotAllowedToDisableItsOwnAccountMembershipRejection implements Rejection {
   accountMembershipId: String!
   message: String!
@@ -17414,6 +17492,22 @@ Rejection returned when the User is not the Card Holder
 """
 type UserNotCardHolderRejection implements Rejection {
   message: String!
+}
+
+"""
+Field we can use when ordering that can be applied when listing users
+"""
+enum UserOrderByFieldInput {
+  createdAt
+  updatedAt
+}
+
+"""
+Order that can be applied when listing users
+"""
+input UserOrderByInput {
+  field: UserOrderByFieldInput
+  direction: OrderByDirection
 }
 
 """
@@ -17724,4 +17818,13 @@ type WebBankingSettings {
   canOrderPhysicalCards: Boolean
   canViewMembers: Boolean
   canAddNewMembers: Boolean
+}
+
+"""
+Rejection returned when a parameter has a wrong value
+"""
+type WrongValueProvidedRejection implements Rejection {
+  message: String!
+  valueProvided: String!
+  parameterName: String!
 }
