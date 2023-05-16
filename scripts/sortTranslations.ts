@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "node:path";
+import path from "pathe";
 
 const isRecord = (value: unknown): value is Record<string, string> => {
   return value != null && Object.values(value).every((v) => typeof v === "string");

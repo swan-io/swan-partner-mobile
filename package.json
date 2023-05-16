@@ -38,8 +38,7 @@
     "format": "prettier '**/*' -u -w",
     "format-locales": "tsx ./scripts/sortTranslations.ts",
     "lint": "yarn generate-env && eslint ./src --ext ts,tsx",
-    "typecheck": "yarn generate-env && tsc --noEmit",
-    "translate-ai": "tsx -r dotenv/config scripts/translateWithAi.ts"
+    "typecheck": "yarn generate-env && tsc --noEmit"
   },
   "lint-staged": {
     "*": "prettier -u -w",
@@ -79,7 +78,6 @@
     "@graphql-codegen/typescript-operations": "3.0.4",
     "@graphql-codegen/typescript-urql-graphcache": "2.4.4",
     "@localazy/cli": "1.7.1",
-    "@swan-io/boxed": "1.0.1",
     "@types/node": "18.16.10",
     "@types/react": "18.2.6",
     "@types/url-parse": "1.4.8",
