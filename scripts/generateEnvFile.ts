@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
-import path from "node:path";
 import url from "node:url";
+import path from "pathe";
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import path from "node:path";
+import path from "pathe";
 import { number, oneOf, string, validate, Validator } from "valienv";
 
 dotenv.config({
