@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "pathe";
 
 const isRecord = (value: unknown): value is Record<string, string> => {
@@ -28,6 +29,6 @@ files.forEach((file) => {
 
   const sorted = sortJson(json);
 
-  fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2));
+  fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2) + os.EOL);
   console.log(`Sorted ${filePath}`);
 });
