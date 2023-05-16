@@ -29,6 +29,6 @@ files.forEach((file) => {
 
   const sorted = sortJson(json);
 
-  fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2) + os.EOL);
+  fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2) + os.EOL, "utf-8");
   console.log(`Sorted ${filePath}`);
 });
