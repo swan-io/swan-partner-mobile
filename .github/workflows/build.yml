@@ -1,0 +1,26 @@
+name: Build & test
+
+on:
+  push:
+    branches:
+      - "main"
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  test:
+    name: Build & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Push translation keys
+        run: yarn localazy upload -w ${{ secrets.LOCALAZY_MOBILE_WRITE_TOKEN }}
