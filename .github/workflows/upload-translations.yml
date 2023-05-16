@@ -1,4 +1,4 @@
-name: Build & test
+name: Upload translations
 
 on:
   push:
