@@ -1,7 +1,7 @@
 import autoload from "@fastify/autoload";
 import closeWithGrace from "close-with-grace";
 import fastify from "fastify";
-import path from "node:path";
+import path from "pathe";
 import { env } from "./utils/env";
 
 const app = fastify({

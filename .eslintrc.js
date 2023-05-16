@@ -1,6 +1,6 @@
 "use strict";
 
-const path = require("path");
+const path = require("pathe");
 
 module.exports = {
   plugins: ["@typescript-eslint"],

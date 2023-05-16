@@ -1,6 +1,6 @@
 import { buildClientSchema, getIntrospectionQuery, printSchema } from "graphql";
 import fs from "node:fs/promises";
-import path from "node:path";
+import path from "pathe";
 
 const { PARTNER_API_URL } = process.env;
 

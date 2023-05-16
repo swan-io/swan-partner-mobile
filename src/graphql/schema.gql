@@ -3049,6 +3049,18 @@ type CanceledFundingSourceStatusInfo implements FundingSourceStatusInfo {
 }
 
 """
+CanceledMerchantPaymentMethodStatusInfo
+"""
+type CanceledMerchantPaymentMethodStatusInfo implements MerchantPaymentMethodStatusInfo {
+  status: MerchantPaymentMethodStatus!
+
+  """
+  Merchant Payment Method canceled date
+  """
+  canceledAt: Date!
+}
+
+"""
 CanceledMerchantPaymentProductStatusInfo
 """
 type CanceledMerchantPaymentProductStatusInfo implements MerchantPaymentProductStatusInfo {
@@ -4685,6 +4697,46 @@ input Certificate {
 }
 
 """
+CheckMerchantPaymentMethod
+"""
+type CheckMerchantPaymentMethod implements MerchantPaymentMethod {
+  """
+  Unique identifier tied to every version of a given Merchant Payment Method
+  """
+  id: ID!
+
+  """
+  The Merchant Payment Method Type
+  """
+  type: MerchantPaymentMethodType!
+
+  """
+  Unique identifier for a given merchant Payment Method, identical for every version of a given Merchant Payment Method Type
+  """
+  productId: ID!
+
+  """
+  Status of the Merchant Payment Method
+  """
+  statusInfo: MerchantPaymentMethodStatusInfo!
+
+  """
+  Version of the Merchant Payment Method
+  """
+  version: Int!
+
+  """
+  Date at which the Merchant Payment Method was last updated
+  """
+  updatedAt: Date!
+
+  """
+  Rolling Reserve applicated to the Merchant Payment Method
+  """
+  rollingReserve: RollingReserve
+}
+
+"""
 CheckMerchantPaymentProduct
 """
 type CheckMerchantPaymentProduct implements MerchantPaymentProduct {
@@ -4742,6 +4794,13 @@ input CheckPaymentCollectionInput {
   Combined with CMC7 line, it allows the check traceability.
   """
   rlmcKey: String!
+}
+
+input CheckPaymentMethodInput {
+  """
+  Determine whether the payment product must be activated or not
+  """
+  activate: Boolean = false
 }
 
 input CheckPaymentProductInput {
@@ -6129,6 +6188,18 @@ type DisabledFundingLimitSettingsStatusInfo implements FundingLimitSettingsStatu
 }
 
 """
+EnabledMerchantPaymentMethodStatusInfo
+"""
+type DisabledMerchantPaymentMethodStatusInfo implements MerchantPaymentMethodStatusInfo {
+  status: MerchantPaymentMethodStatus!
+
+  """
+  Merchant Payment Method disabled date
+  """
+  disabledAt: Date!
+}
+
+"""
 EnabledMerchantPaymentProductStatusInfo
 """
 type DisabledMerchantPaymentProductStatusInfo implements MerchantPaymentProductStatusInfo {
@@ -6194,6 +6265,18 @@ type EnabledFundingSourceStatusInfo implements FundingSourceStatusInfo {
 
   """
   Date at which the funding source was enabled
+  """
+  enabledAt: Date!
+}
+
+"""
+EnabledMerchantPaymentMethodStatusInfo
+"""
+type EnabledMerchantPaymentMethodStatusInfo implements MerchantPaymentMethodStatusInfo {
+  status: MerchantPaymentMethodStatus!
+
+  """
+  Merchant Payment Method enabled date
   """
   enabledAt: Date!
 }
@@ -6607,13 +6690,44 @@ type FeeOutDebtor implements FeeDebtor {
 Fees type
 """
 enum FeesTypeEnum {
+  """
+  Processing of judicial or administrative seizures, notice to third-party holders
+  """
   ProcessingJudicialOrAdministrativeSeizure
+
+  """
+  Drafting a circulation letter for a legal entity holder
+  """
   CirculationLetterDraftingFee
+
+  """
+  When a cash withdrawal is made from an ATM outside the SEPA area
+  """
   CashWithdrawalsOutsideSEPA
+
+  """
+  When a card payment for goods and services is made outside the SEPA area
+  """
   CardPaymentsOutsideSEPA
+
+  """
+  When a cash withdrawal is made from an ATM in the SEPA area
+  """
   CashWithdrawalsWithinSEPA
+
+  """
+  When a direct debit was rejected due to an insufficient account balance
+  """
   DirectDebitRejection
+
+  """
+  Fee for attempting or performing acts in violation of the law and/or this Account Agreement
+  """
   ImproperUseOfAccount
+
+  """
+  Intervention fee for managing unauthorized overdrafts
+  """
   UnauthorizedOverdraft
   BankingFee
 }
@@ -8142,6 +8256,53 @@ type InternalCreditTransferOutDebtor implements InternalCreditTransferDebtor {
 }
 
 """
+InternalDirectDebitB2BMerchantPaymentMethod
+"""
+type InternalDirectDebitB2BMerchantPaymentMethod implements MerchantPaymentMethod {
+  """
+  Unique identifier tied to every version of a given Merchant Payment Method
+  """
+  id: ID!
+
+  """
+  The Merchant Payment Method Type
+  """
+  type: MerchantPaymentMethodType!
+
+  """
+  Unique identifier for a given merchant Payment Method, identical for every version of a given Merchant Payment Method Type
+  """
+  productId: ID!
+
+  """
+  Status of the Merchant Payment Method
+  """
+  statusInfo: MerchantPaymentMethodStatusInfo!
+
+  """
+  Version of the Merchant Payment Method
+  """
+  version: Int!
+
+  """
+  Date at which the Merchant Payment Method was last updated
+  """
+  updatedAt: Date!
+
+  """
+  Rolling Reserve applicated to the Merchant Payment Method
+  """
+  rollingReserve: RollingReserve
+}
+
+input InternalDirectDebitB2BPaymentMethodInput {
+  """
+  If `true`, the PaymentProduct will become Disabled
+  """
+  activate: Boolean = false
+}
+
+"""
 Internal Direct Debit Creditor
 """
 type InternalDirectDebitCreditor {
@@ -8240,6 +8401,53 @@ enum InternalDirectDebitScheme {
 enum InternalDirectDebitSequence {
   OneOff
   Recurring
+}
+
+"""
+InternalDirectDebitStandardMerchantPaymentMethod
+"""
+type InternalDirectDebitStandardMerchantPaymentMethod implements MerchantPaymentMethod {
+  """
+  Unique identifier tied to every version of a given Merchant Payment Method
+  """
+  id: ID!
+
+  """
+  The Merchant Payment Method Type
+  """
+  type: MerchantPaymentMethodType!
+
+  """
+  Unique identifier for a given merchant Payment Method, identical for every version of a given Merchant Payment Method Type
+  """
+  productId: ID!
+
+  """
+  Status of the Merchant Payment Method
+  """
+  statusInfo: MerchantPaymentMethodStatusInfo!
+
+  """
+  Version of the Merchant Payment Method
+  """
+  version: Int!
+
+  """
+  Date at which the Merchant Payment Method was last updated
+  """
+  updatedAt: Date!
+
+  """
+  Rolling Reserve applicated to the Merchant Payment Method
+  """
+  rollingReserve: RollingReserve
+}
+
+input InternalDirectDebitStandardPaymentMethodInput {
+  """
+  If `true`, the PaymentProduct will become Disabled
+  """
+  activate: Boolean = false
 }
 
 """
@@ -9303,6 +9511,77 @@ enum MerchantCategoryDescription {
 }
 
 """
+Base object for the different Payment Methods available
+"""
+interface MerchantPaymentMethod {
+  """
+  Unique identifier tied to every version of a given Merchant Payment Method
+  """
+  id: ID!
+
+  """
+  The Merchant Payment Method Type
+  """
+  type: MerchantPaymentMethodType!
+
+  """
+  Unique identifier for a given merchant Payment Method, identical for every version of a given Merchant Payment Method Type
+  """
+  productId: ID!
+
+  """
+  Status of the Merchant Payment Method
+  """
+  statusInfo: MerchantPaymentMethodStatusInfo!
+
+  """
+  Version of the Merchant Payment Method
+  """
+  version: Int!
+
+  """
+  Date at which the Merchant Payment Method was last updated
+  """
+  updatedAt: Date!
+
+  """
+  Rolling Reserve applicated to the Merchant Payment Method
+  """
+  rollingReserve: RollingReserve
+}
+
+"""
+The different statuses a MerchantPaymentMethod can have
+"""
+enum MerchantPaymentMethodStatus {
+  PendingReview
+  Enabled
+  Rejected
+  Disabled
+  Canceled
+  Suspended
+}
+
+"""
+The payment method status information
+"""
+interface MerchantPaymentMethodStatusInfo {
+  """
+  Merchant Payment Method Status
+  """
+  status: MerchantPaymentMethodStatus!
+}
+
+"""
+The different statuses a MerchantPaymentMethod can have
+"""
+enum MerchantPaymentMethodType {
+  InternalDirectDebitStandard
+  InternalDirectDebitB2B
+  Check
+}
+
+"""
 Base object for the different Payment Products available
 """
 interface MerchantPaymentProduct {
@@ -9415,6 +9694,12 @@ type MerchantProfile {
   Payment Products associated
   """
   merchantPaymentProducts: [MerchantPaymentProduct!]
+    @deprecated(reason: "Use merchantPaymentMethods instead")
+
+  """
+  Payment Methods associated
+  """
+  merchantPaymentMethods: [MerchantPaymentMethod!]
 
   """
   expected average basket value.
@@ -9610,6 +9895,16 @@ type Mutation {
   The user must have an account membership for this account with the attribute `canInitiateCreditTransfer=true`.
   """
   initiateFundingRequest(input: InitiateFundingRequestInput!): InitiateFundingRequestPayload
+  initiateMerchantPaymentCollection(
+    input: InitiateMerchantPaymentCollectionInput!
+  ): InitiateMerchantPaymentCollectionPayload
+
+  """
+  Request merchant payment methods for a merchant profile
+  """
+  requestMerchantPaymentMethods(
+    input: RequestMerchantPaymentMethodsInput!
+  ): RequestMerchantPaymentMethodsPayload
 
   """
   Request merchant payment products for a merchant profile
@@ -9617,6 +9912,7 @@ type Mutation {
   requestMerchantPaymentProducts(
     input: RequestMerchantPaymentProductsInput!
   ): RequestMerchantPaymentProductsPayload
+    @deprecated(reason: "Use requestMerchantPaymentMethods instead")
 
   """
   Schedule a standing Order
@@ -9626,9 +9922,6 @@ type Mutation {
   The user must have an account membership to the account and the permission to initiate credit transfer
   """
   scheduleStandingOrder(input: ScheduleStandingOrderInput!): ScheduleStandingOrderPayload!
-  initiateMerchantPaymentCollection(
-    input: InitiateMerchantPaymentCollectionInput!
-  ): InitiateMerchantPaymentCollectionPayload
 
   """
   Cancels an UPCOMING credit transfer
@@ -11577,6 +11870,13 @@ type PendingFundingSourceStatusInfo implements FundingSourceStatusInfo {
 }
 
 """
+PendingMerchantPaymentMethodStatusInfo
+"""
+type PendingMerchantPaymentMethodStatusInfo implements MerchantPaymentMethodStatusInfo {
+  status: MerchantPaymentMethodStatus!
+}
+
+"""
 PendingMerchantPaymentProductStatusInfo
 """
 type PendingMerchantPaymentProductStatusInfo implements MerchantPaymentProductStatusInfo {
@@ -12941,6 +13241,18 @@ type RejectedFundingSourceStatusInfo implements FundingSourceStatusInfo {
 }
 
 """
+RejectedMerchantPaymentMethodStatusInfo
+"""
+type RejectedMerchantPaymentMethodStatusInfo implements MerchantPaymentMethodStatusInfo {
+  status: MerchantPaymentMethodStatus!
+
+  """
+  Merchant Payment Method rejected date
+  """
+  rejectedAt: Date!
+}
+
+"""
 RejectedMerchantPaymentProductStatusInfo
 """
 type RejectedMerchantPaymentProductStatusInfo implements MerchantPaymentProductStatusInfo {
@@ -13291,6 +13603,38 @@ type ReportExchangeRate {
   targetCurrency: Currency!
   quotationDate: Date!
   contractIdentification: String
+}
+
+input RequestMerchantPaymentMethodsInput {
+  """
+  ID of the Merchant Profile
+  """
+  merchantProfileId: ID!
+
+  """
+  Input for the Internal Direct Debit Standard payment method
+  """
+  internalDirectDebitStandard: InternalDirectDebitStandardPaymentMethodInput
+
+  """
+  Input for the Internal Direct Debit B2B payment method
+  """
+  internalDirectDebitB2B: InternalDirectDebitB2BPaymentMethodInput
+
+  """
+  Input for Check payment product
+  """
+  check: CheckPaymentProductInput
+}
+
+union RequestMerchantPaymentMethodsPayload =
+    RequestMerchantPaymentMethodsSuccessPayload
+  | ForbiddenRejection
+  | NotFoundRejection
+  | InternalErrorRejection
+
+type RequestMerchantPaymentMethodsSuccessPayload {
+  merchantProfile: MerchantProfile
 }
 
 input RequestMerchantPaymentProductsInput {
@@ -15249,6 +15593,11 @@ input StatementFiltersInput {
   To filter before an updatedAt value
   """
   isBeforeUpdatedAt: DateTime
+
+  """
+  To filter on a specific period of statement (either custom or monthly)
+  """
+  period: StatementPeriod
 }
 
 """
@@ -16046,6 +16395,18 @@ type SuspendedFundingSourceStatusInfo implements FundingSourceStatusInfo {
 
   """
   Date at which the funding source was suspended
+  """
+  suspendedAt: Date!
+}
+
+"""
+SuspendedMerchantPaymentMethodStatusInfo
+"""
+type SuspendedMerchantPaymentMethodStatusInfo implements MerchantPaymentMethodStatusInfo {
+  status: MerchantPaymentMethodStatus!
+
+  """
+  Merchant Payment Method suspended date
   """
   suspendedAt: Date!
 }
