@@ -21,4 +21,4 @@ jobs:
         run: yarn install --pure-lockfile
 
       - name: Push translation keys
-        run: yarn localazy upload --write-key ${{ secrets.LOCALAZY_MOBILE_WRITE_KEY }}
+        run: yarn localazy upload -r ${{ secrets.LOCALAZY_MOBILE_READ_KEY }} -w ${{ secrets.LOCALAZY_MOBILE_WRITE_KEY }}
