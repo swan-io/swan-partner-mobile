@@ -6,6 +6,7 @@ on:
 
 jobs:
   upload-translations:
+    name: Upload translations
     runs-on: ubuntu-latest
     permissions:
       contents: read # required for actions / checkout
