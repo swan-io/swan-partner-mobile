@@ -12,7 +12,7 @@
   "cardListScreen.showCardButton": "Mostra in {serviceName}",
   "cardListScreen.title": "Carte",
   "error.generic": "Si è verificato un errore",
-  "errorView.logoutButton": "Logout",
+  "errorView.logoutButton": "Esci",
   "errorView.text": "Qualcosa è andato storto",
-  "logoutButton.text": "Logout"
+  "logoutButton.text": "Esci"
 }

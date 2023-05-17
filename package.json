@@ -36,10 +36,12 @@
     "start": "yarn generate-env && react-native start",
     "cold-start": "yarn generate-env && react-native start --reset-cache",
     "format": "prettier '**/*' -u -w",
+    "format-locales": "tsx ./scripts/sortTranslations.ts",
     "lint": "yarn generate-env && eslint ./src --ext ts,tsx",
     "typecheck": "yarn generate-env && tsc --noEmit"
   },
   "lint-staged": {
+    "src/locales/*.json": "yarn format-locales",
     "*": "prettier -u -w"
   },
   "dependencies": {
@@ -75,6 +77,7 @@
     "@graphql-codegen/typescript": "3.0.4",
     "@graphql-codegen/typescript-operations": "3.0.4",
     "@graphql-codegen/typescript-urql-graphcache": "2.4.4",
+    "@localazy/cli": "1.7.1",
     "@types/node": "18.16.10",
     "@types/react": "18.2.6",
     "@types/url-parse": "1.4.8",
