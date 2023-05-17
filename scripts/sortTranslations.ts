@@ -2,33 +2,24 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "pathe";
 
-const isRecord = (value: unknown): value is Record<string, string> => {
-  return value != null && Object.values(value).every((v) => typeof v === "string");
-};
+const isStringRecord = (value: unknown): value is Record<string, string> =>
+  value != null && Object.values(value).every((item) => typeof item === "string");
 
-const sortJson = (json: Record<string, string>) => {
-  const keys = Object.keys(json).sort();
-  const sortedJson: Record<string, string> = {};
-  keys.forEach((key) => {
-    sortedJson[key] = json[key] as string;
-  });
-  return sortedJson;
-};
-
-const dirPath = `src/locales`;
-const files = fs.readdirSync(dirPath);
+const localesPath = path.resolve(__dirname, "../src/locales");
+const files = fs.readdirSync(localesPath).map((file) => path.join(localesPath, file));
 
 files.forEach((file) => {
-  const filePath = path.join(dirPath, file);
-  const content = fs.readFileSync(filePath, "utf8");
+  const content = fs.readFileSync(file, "utf-8");
   const json: unknown = JSON.parse(content);
 
-  if (!isRecord(json)) {
-    throw new Error(`Invalid JSON: ${filePath}`);
+  if (!isStringRecord(json)) {
+    throw new Error(`Invalid JSON: ${file}`);
   }
 
-  const sorted = sortJson(json);
+  const sorted = Object.keys(json)
+    .sort()
+    .reduce<Record<string, string>>((acc, key) => ({ ...acc, [key]: json[key] }), {});
 
-  fs.writeFileSync(filePath, JSON.stringify(sorted, null, 2) + os.EOL, "utf-8");
-  console.log(`Sorted ${filePath}`);
+  fs.writeFileSync(file, JSON.stringify(sorted, null, 2) + os.EOL, "utf-8");
+  console.log(`Sorted ${file}`);
 });

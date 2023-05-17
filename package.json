@@ -41,8 +41,8 @@
     "typecheck": "yarn generate-env && tsc --noEmit"
   },
   "lint-staged": {
-    "*": "prettier -u -w",
-    "src/locales/*.json": "yarn format-locales"
+    "src/locales/*.json": "yarn format-locales",
+    "*": "prettier -u -w"
   },
   "dependencies": {
     "@0no-co/graphql.web": "1.0.1",
