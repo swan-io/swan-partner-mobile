@@ -6,7 +6,7 @@ dotenv.config({
   path: path.join(process.cwd(), ".env"),
 });
 
-const url: Validator<string> = (value) => {
+const url: Validator<string> = (value = "") => {
   try {
     new URL(value);
     return value;
