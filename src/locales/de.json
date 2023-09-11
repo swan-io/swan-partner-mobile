@@ -12,7 +12,6 @@
   "cardListScreen.showCardButton": "In {serviceName} anzeigen",
   "cardListScreen.title": "Karten",
   "error.generic": "Es ist ein Fehler aufgetreten",
-  "errorView.logoutButton": "Ausloggen",
   "errorView.text": "Es ist ein Fehler aufgetreten.",
   "logoutButton.text": "Ausloggen",
   "projectListScreen.description": "Hier sind die von Ihnen verwendeten Kartenmarken:",

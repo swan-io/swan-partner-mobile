@@ -12,7 +12,6 @@
   "cardListScreen.showCardButton": "Afficher dans {serviceName}",
   "cardListScreen.title": "Cartes",
   "error.generic": "Une erreur est survenue",
-  "errorView.logoutButton": "Déconnexion",
   "errorView.text": "Une erreur est survenue",
   "logoutButton.text": "Déconnexion",
   "projectListScreen.description": "Voici les marques de cartes que vous utilisez :",
