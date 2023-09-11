@@ -14,5 +14,8 @@
   "error.generic": "Ocorreu um erro",
   "errorView.logoutButton": "Terminar sessão",
   "errorView.text": "Algo correu mal",
-  "logoutButton.text": "Terminar sessão"
+  "logoutButton.text": "Terminar sessão",
+  "projectListScreen.description": "Aqui estão as marcas de cartão que usa:",
+  "projectListScreen.noProjectMessage": "Nenhum projeto encontrado",
+  "projectListScreen.title": "Marcas"
 }

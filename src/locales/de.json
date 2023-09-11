@@ -14,5 +14,8 @@
   "error.generic": "Es ist ein Fehler aufgetreten",
   "errorView.logoutButton": "Ausloggen",
   "errorView.text": "Es ist ein Fehler aufgetreten.",
-  "logoutButton.text": "Ausloggen"
+  "logoutButton.text": "Ausloggen",
+  "projectListScreen.description": "Hier sind die von Ihnen verwendeten Kartenmarken:",
+  "projectListScreen.noProjectMessage": "Kein Projekt gefunden",
+  "projectListScreen.title": "Marken"
 }

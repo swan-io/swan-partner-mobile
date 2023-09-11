@@ -14,5 +14,8 @@
   "error.generic": "An error occurred",
   "errorView.logoutButton": "Logout",
   "errorView.text": "Something went wrong",
-  "logoutButton.text": "Logout"
+  "logoutButton.text": "Logout",
+  "projectListScreen.description": "Here are the card brands you use:",
+  "projectListScreen.noProjectMessage": "No project found",
+  "projectListScreen.title": "Brands"
 }

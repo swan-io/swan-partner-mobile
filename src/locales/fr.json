@@ -14,5 +14,8 @@
   "error.generic": "Une erreur est survenue",
   "errorView.logoutButton": "Déconnexion",
   "errorView.text": "Une erreur est survenue",
-  "logoutButton.text": "Déconnexion"
+  "logoutButton.text": "Déconnexion",
+  "projectListScreen.description": "Voici les marques de cartes que vous utilisez :",
+  "projectListScreen.noProjectMessage": "Pas de projet trouvé",
+  "projectListScreen.title": "Marques"
 }
