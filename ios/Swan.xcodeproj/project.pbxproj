@@ -345,7 +345,7 @@
 				CODE_SIGN_ENTITLEMENTS = Swan/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1680686046;
+				CURRENT_PROJECT_VERSION = 1694438152;
 				DEVELOPMENT_TEAM = 6GQ3C334JL;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 6GQ3C334JL;
 				ENABLE_BITCODE = NO;
@@ -361,7 +361,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Swan\"",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -386,7 +386,7 @@
 				CODE_SIGN_ENTITLEMENTS = Swan/Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1669802990;
+				CURRENT_PROJECT_VERSION = 1694438152;
 				DEVELOPMENT_TEAM = 6GQ3C334JL;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 6GQ3C334JL;
 				ENABLE_BITCODE = NO;
@@ -402,7 +402,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Swan\"",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -479,6 +479,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
@@ -544,6 +545,7 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",

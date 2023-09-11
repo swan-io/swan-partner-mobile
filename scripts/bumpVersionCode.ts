@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const rootPath = path.resolve(__dirname, "..");
 
 const androidRegExp = /versionCode \d+/;
-const iosRegExp = /CURRENT_PROJECT_VERSION = \d+;/;
+const iosRegExp = /CURRENT_PROJECT_VERSION = \d+;/g;
 const nextVersionCode = Math.floor(Date.now() / 1000).toFixed(0);
 
 const androidFilePath = path.join(rootPath, "android", "app", "build.gradle");
