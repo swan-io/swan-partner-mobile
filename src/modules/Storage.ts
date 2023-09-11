@@ -11,9 +11,7 @@ export const Storage = {
   setItem,
 
   getItemOrFail: (key: StorageKey) =>
-    getItem(key).then((value) =>
-      value !== null ? value : Promise.reject(new Error(`${key} value is null`)),
-    ),
+    getItem(key).then((value) => value ?? Promise.reject(new Error(`${key} value is null`))),
 
   multiGet: <K extends StorageKey>(keys: K[]) =>
     AsyncStorage.multiGet(keys).then((values) =>

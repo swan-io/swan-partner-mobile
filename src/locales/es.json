@@ -12,7 +12,6 @@
   "cardListScreen.showCardButton": "Mostrar en {serviceName}",
   "cardListScreen.title": "Tarjetas",
   "error.generic": "Ha ocurrido un error",
-  "errorView.logoutButton": "Cerrar sesión",
   "errorView.text": "Algo salió mal",
   "logoutButton.text": "Cerrar sesión",
   "projectListScreen.description": "Aquí están las marcas de tarjetas que utiliza:",

@@ -34,7 +34,7 @@ export const ErrorView = (_props: Props) => {
       <Space height={8} />
       <Text variant="medium">{t("errorView.text")}</Text>
       <Space height={24} />
-      <Button title={t("errorView.logoutButton")} onPress={handleOnLogout} variant="small" />
+      <Button title={t("logoutButton.text")} onPress={handleOnLogout} variant="small" />
     </SafeAreaView>
   );
 };

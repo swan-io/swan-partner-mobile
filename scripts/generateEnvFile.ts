@@ -11,7 +11,7 @@ const variables = fs
   .readFileSync(path.join(rootPath, ".env.example"), "utf-8")
   .split(os.EOL)
   .map((line) => line.trim())
-  .filter((line) => line.startsWith("#") || line.includes("="))
+  .filter((line) => !line.startsWith("#") && line.includes("="))
   .map((line) => line.split("=")[0]);
 
 const typesDef = `declare module "@env" {

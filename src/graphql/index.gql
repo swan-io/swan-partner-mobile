@@ -39,10 +39,6 @@ query CardList(
         }
         accountMembership {
           id
-          account {
-            id
-            number
-          }
           statusInfo {
             status
           }

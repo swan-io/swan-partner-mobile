@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
 
 type ListItemProps = {
   mode: "add" | "show" | "added" | "error";
-  accountNumber: string;
   designUrl: string;
   holderName: string;
   id: string;
@@ -85,7 +84,6 @@ type ListItemProps = {
 const ListItem = ({
   mode,
   designUrl,
-  accountNumber,
   holderName,
   id,
   lastFourDigits,
@@ -93,6 +91,7 @@ const ListItem = ({
   textColor,
   onCallback,
 }: ListItemProps) => {
+  const disabled = mode === "added" || mode === "error";
   const [{ fetching }, addDigitalCard] = useMutation(AddDigitalCardDocument);
 
   const handleAddCard = React.useCallback(() => {
@@ -143,7 +142,6 @@ const ListItem = ({
   return (
     <View style={styles.item}>
       <Heading variant="h4">{holderName}</Heading>
-      <Text>{accountNumber}</Text>
       <Space height={24} />
 
       <CreditCard
@@ -160,7 +158,7 @@ const ListItem = ({
       ) : (
         <TouchableOpacity
           accessibilityRole="button"
-          disabled={mode === "added"}
+          disabled={disabled}
           style={styles.actionLine}
           onPress={match(mode)
             .with("add", () => handleAddCard)
@@ -177,7 +175,7 @@ const ListItem = ({
               .exhaustive()}
           </Text>
 
-          {mode !== "added" && (
+          {!disabled && (
             <>
               <Space width={8} />
               <Icon name="chevron-right" size={16} color={colors.gray[400]} />
@@ -237,15 +235,13 @@ export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps
     React.useCallback(
       ({ item: { node } }) => {
         const { accountMembership, cardMaskedNumber } = node;
-        const { account, statusInfo, user } = accountMembership;
-        const accountNumber = account?.number;
+        const { statusInfo, user } = accountMembership;
         const holderName = [user?.firstName, user?.lastName].filter(isNotNullish).join(" ");
         const lastFourDigits = cardMaskedNumber.slice(-4);
 
         if (
           cardsInWallet.tag !== "data" ||
           isNullish(user) ||
-          isNullish(accountNumber) ||
           isEmpty(holderName) ||
           statusInfo.status === "BindingUserError"
         ) {
@@ -275,7 +271,6 @@ export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps
                 ? "show"
                 : "added"
             }
-            accountNumber={accountNumber}
             designUrl={designUrl}
             holderName={holderName}
             id={node.id}
