@@ -35,7 +35,7 @@ const images: Record<SupportedLanguage, () => ImageSourcePropType> = {
   nl: () => require("../assets/google-pay-button/nl.png"),
   // no: () => require("../assets/google-pay-button/no.png"),
   // pl: () => require("../assets/google-pay-button/pl.png"),
-  // pt: () => require("../assets/google-pay-button/pt.png"),
+  pt: () => require("../assets/google-pay-button/pt.png"),
   // ro: () => require("../assets/google-pay-button/ro.png"),
   // ru: () => require("../assets/google-pay-button/ru.png"),
   // sk: () => require("../assets/google-pay-button/sk.png"),
