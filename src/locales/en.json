@@ -1,7 +1,7 @@
 {
   "authenticationScreen.signInButton": "Sign in",
   "cardDetailsScreen.descriptionEnd": "to use it immediately.",
-  "cardDetailsScreen.descriptionStart": "Add you card to",
+  "cardDetailsScreen.descriptionStart": "Add your card to",
   "cardDetailsScreen.laterButton": "Later",
   "cardListScreen.addCardButton": "Add to {serviceName}",
   "cardListScreen.alreadyAdded": "Already in {serviceName}",
@@ -14,5 +14,8 @@
   "error.generic": "An error occurred",
   "errorView.logoutButton": "Logout",
   "errorView.text": "Something went wrong",
-  "logoutButton.text": "Logout"
+  "logoutButton.text": "Logout",
+  "projectListScreen.description": "Here are the card brands you use:",
+  "projectListScreen.noProjectMessage": "No project found",
+  "projectListScreen.title": "Brands"
 }

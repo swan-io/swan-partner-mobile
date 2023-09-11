@@ -1,18 +1,21 @@
 {
   "authenticationScreen.signInButton": "Iniciar sesión",
   "cardDetailsScreen.descriptionEnd": "para utilizarla de inmediato.",
-  "cardDetailsScreen.descriptionStart": "Añada su tarjeta a",
+  "cardDetailsScreen.descriptionStart": "Añade tu tarjeta a",
   "cardDetailsScreen.laterButton": "Más tarde",
   "cardListScreen.addCardButton": "Añadir a {serviceName}",
   "cardListScreen.alreadyAdded": "Ya en {serviceName}",
   "cardListScreen.cannotBeAdded": "No se puede añadir",
-  "cardListScreen.description": "Aquí tiene sus tarjetas Swan. Añádalas a {serviceName} para utilizarlas directamente desde su dispositivo.",
+  "cardListScreen.description": "Aquí tienes tus tarjetas de Swan. Añádelas a {serviceName} para utilizarlas directamente desde tu dispositivo.",
   "cardListScreen.noCardMessage": "No se ha encontrado ninguna tarjeta",
-  "cardListScreen.noWalletUsageMessage": "No se puede acceder a la billetera digital",
+  "cardListScreen.noWalletUsageMessage": "No se puede acceder al Wallet",
   "cardListScreen.showCardButton": "Mostrar en {serviceName}",
   "cardListScreen.title": "Tarjetas",
   "error.generic": "Ha ocurrido un error",
-  "errorView.logoutButton": "Cierre de sesión",
+  "errorView.logoutButton": "Cerrar sesión",
   "errorView.text": "Algo salió mal",
-  "logoutButton.text": "Cierre de sesión"
+  "logoutButton.text": "Cerrar sesión",
+  "projectListScreen.description": "Aquí están las marcas de tarjetas que utiliza:",
+  "projectListScreen.noProjectMessage": "No se ha encontrado ningún proyecto",
+  "projectListScreen.title": "Marcas"
 }

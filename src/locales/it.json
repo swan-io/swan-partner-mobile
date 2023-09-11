@@ -1,6 +1,6 @@
 {
   "authenticationScreen.signInButton": "Accedi",
-  "cardDetailsScreen.descriptionEnd": "da usare immediatamente.",
+  "cardDetailsScreen.descriptionEnd": "per utilizzarla subito.",
   "cardDetailsScreen.descriptionStart": "Aggiungi la tua carta a",
   "cardDetailsScreen.laterButton": "Più tardi",
   "cardListScreen.addCardButton": "Aggiungi a {serviceName}",
@@ -14,5 +14,8 @@
   "error.generic": "Si è verificato un errore",
   "errorView.logoutButton": "Esci",
   "errorView.text": "Qualcosa è andato storto",
-  "logoutButton.text": "Esci"
+  "logoutButton.text": "Esci",
+  "projectListScreen.description": "Qui trovi i brand delle carte che usi:",
+  "projectListScreen.noProjectMessage": "Nessun progetto trovato",
+  "projectListScreen.title": "Brand"
 }
