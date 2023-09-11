@@ -8,7 +8,7 @@
   "cardListScreen.cannotBeAdded": "Kan niet toegevoegd worden",
   "cardListScreen.description": "Hier zijn je Swan-kaarten. Voeg ze toe aan {serviceName} om ze direct vanaf je apparaat te gebruiken.",
   "cardListScreen.noCardMessage": "Geen kaart gevonden",
-  "cardListScreen.noWalletUsageMessage": "Geen toegang tot wallet",
+  "cardListScreen.noWalletUsageMessage": "Geen toegang tot Wallet",
   "cardListScreen.showCardButton": "Tonen in {serviceName}",
   "cardListScreen.title": "Kaarten",
   "error.generic": "Er ging iets fout",

@@ -8,7 +8,7 @@
   "cardListScreen.cannotBeAdded": "Não pode ser adicionado",
   "cardListScreen.description": "Aqui estão os seus cartões Swan. Adicione-os a {serviceName} para usá-los diretamente do seu dispositivo.",
   "cardListScreen.noCardMessage": "Nenhum cartão encontrado",
-  "cardListScreen.noWalletUsageMessage": "Não é possível aceder a carteira digital",
+  "cardListScreen.noWalletUsageMessage": "Não é possível aceder a Wallet",
   "cardListScreen.showCardButton": "Mostrado em {serviceName}",
   "cardListScreen.title": "Cartões",
   "error.generic": "Ocorreu um erro",

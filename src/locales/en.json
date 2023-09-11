@@ -1,7 +1,7 @@
 {
   "authenticationScreen.signInButton": "Sign in",
   "cardDetailsScreen.descriptionEnd": "to use it immediately.",
-  "cardDetailsScreen.descriptionStart": "Add you card to",
+  "cardDetailsScreen.descriptionStart": "Add your card to",
   "cardDetailsScreen.laterButton": "Later",
   "cardListScreen.addCardButton": "Add to {serviceName}",
   "cardListScreen.alreadyAdded": "Already in {serviceName}",
