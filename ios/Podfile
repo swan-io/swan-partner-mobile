@@ -48,7 +48,7 @@ target 'Swan' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'IQKeyboardManager', '~> 6.5.11'
+  pod 'IQKeyboardManager', '~> 6.5.13'
 
   post_install do |installer|
     installer.pods_project.targets.each do |target|
@@ -67,7 +67,6 @@ target 'Swan' do
       end
     end
 
-    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
       config[:reactNativePath],
