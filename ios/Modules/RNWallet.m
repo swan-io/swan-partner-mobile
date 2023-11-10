@@ -186,20 +186,24 @@ RCT_EXPORT_METHOD(addCard:(NSDictionary *)data) {
                                nonce:(nonnull NSData *)nonce
                       nonceSignature:(nonnull NSData *)nonceSignature
                    completionHandler:(nonnull void (^)(PKAddPaymentPassRequest * _Nonnull))handler {
-  NSMutableArray<NSString *> *strCertificates = [NSMutableArray array];
+  NSMutableArray<NSDictionary *> *base64Certificates = [NSMutableArray array];
 
-  // TODO: Add LEAF | INTERMEDIATE here
-  for (NSData *data in certificates) {
-    [strCertificates addObject:[data base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed]];
+  for (int index = 0; index < [certificates count]; index++) {
+    NSData *certificate = [certificates objectAtIndex:index];
+
+    [base64Certificates addObject:@{
+      @"key": index == 0 ? @"LEAF" : @"INTERMEDIATE",
+      @"value": [certificate base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed]
+    }];
   }
 
   NSDictionary *data = @{
-    @"certificates": strCertificates,
+    @"certificates": base64Certificates,
     @"nonce": [self dataToHex:nonce],
     @"nonceSignature": [self dataToHex:nonceSignature],
   };
 
-  _completionHandler  = handler;
+  _completionHandler = handler;
   [self sendAddCardEvent:@"setCardInfos" data:data];
 }
 

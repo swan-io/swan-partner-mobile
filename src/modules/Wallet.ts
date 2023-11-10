@@ -2,16 +2,25 @@ import { NativeEventEmitter, NativeModules } from "react-native";
 import { match } from "ts-pattern";
 
 export type AddCardResponseType = "cancel" | "success";
-type CertificateKeyType = "LEAF" | "INTERMEDIATE";
+
+type Certificate = {
+  key: "LEAF" | "INTERMEDIATE";
+  value: string;
+};
 
 type SignatureData = {
-  certificates: { key: CertificateKeyType; value: string }[];
+  certificates: Certificate[];
   nonce: string;
   nonceSignature: string;
 };
 
 type AddCardEvent =
-  | { type: "setCardInfos"; certificates: string[]; nonce: string; nonceSignature: string }
+  | {
+      type: "setCardInfos";
+      certificates: Certificate[];
+      nonce: string;
+      nonceSignature: string;
+    }
   | { type: "error"; message: string }
   | { type: "cancel" }
   | { type: "success" };
