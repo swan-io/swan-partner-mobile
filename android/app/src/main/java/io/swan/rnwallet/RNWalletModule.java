@@ -53,27 +53,6 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
   }
 
   @Override
-  public void onActivityResult(Activity activity, int requestCode, int resultCode, @Nullable Intent intent) {
-    if (requestCode != REQUEST_CODE_PUSH_TOKENIZE || mPromise == null) {
-      return;
-    }
-
-    switch (resultCode) {
-      case Activity.RESULT_OK:
-        mPromise.resolve("success");
-        break;
-      case Activity.RESULT_CANCELED:
-        mPromise.resolve("cancel");
-        break;
-      default:
-        mPromise.reject("ADD_CARD_ERROR", "Could not provision card");
-    }
-
-    // Remove promise so it cannot be reused
-    mPromise = null;
-  }
-
-  @Override
   public void onNewIntent(Intent intent) {}
 
   @ReactMethod
@@ -166,5 +145,26 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
 
     mPromise = promise;
     tapAndPayClient.pushTokenize(activity, request, REQUEST_CODE_PUSH_TOKENIZE);
+  }
+
+  @Override
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, @Nullable Intent intent) {
+    if (requestCode != REQUEST_CODE_PUSH_TOKENIZE || mPromise == null) {
+      return;
+    }
+
+    switch (resultCode) {
+      case Activity.RESULT_OK:
+        mPromise.resolve(true);
+        break;
+      case Activity.RESULT_CANCELED:
+        mPromise.resolve(false);
+        break;
+      default:
+        mPromise.reject("ADD_CARD_ERROR", "Could not provision card");
+    }
+
+    // Remove promise so it cannot be reused
+    mPromise = null;
   }
 }
