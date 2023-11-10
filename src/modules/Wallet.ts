@@ -12,10 +12,10 @@ type SignatureData = {
   nonceSignature: string;
 };
 
-type WalletEvent<Name extends string, Data> = {
-  name: Name;
-  data: Data;
-};
+type WalletEvent =
+  | { name: "signatureData"; data: SignatureData }
+  | { name: "error"; data: string }
+  | { name: "finished"; data: boolean };
 
 export type AddCardData = {
   cardHolderName: string;
@@ -48,11 +48,11 @@ const NativeModule = NativeModules.RNWallet as {
 
 // @ts-expect-error
 const emitter = new NativeEventEmitter(NativeModule);
-const removeAllListeners = () => emitter.removeAllListeners("onWalletEvent");
+const removeAllListeners = () => emitter.removeAllListeners("onAddCardEvent");
 
 export const Wallet = {
-  getCards: () => NativeModule.getCards(),
-  openCard: (passURL: string) => NativeModule.openCard(passURL),
+  getCards: (): Promise<Card[]> => NativeModule.getCards(),
+  openCard: (passURL: string): Promise<void> => NativeModule.openCard(passURL),
 
   addCard: ({
     fetchInAppProvisioningData,
@@ -63,34 +63,26 @@ export const Wallet = {
     new Promise<boolean>((resolve, reject) => {
       removeAllListeners();
 
-      emitter.addListener(
-        "onWalletEvent",
-        (
-          event:
-            | WalletEvent<"signatureData", SignatureData>
-            | WalletEvent<"error", { message: string }>
-            | WalletEvent<"finished", { success: boolean }>,
-        ) => {
-          match(event)
-            .with({ name: "signatureData" }, ({ data }) => {
-              fetchInAppProvisioningData(data)
-                .then((data) => NativeModule.setInAppProvisioningData(data))
-                .catch((error) => {
-                  reject(error);
-                  removeAllListeners();
-                });
-            })
-            .with({ name: "error" }, ({ data }) => {
-              reject(new Error(data.message));
-              removeAllListeners();
-            })
-            .with({ name: "finished" }, ({ data }) => {
-              resolve(data.success);
-              removeAllListeners();
-            })
-            .exhaustive();
-        },
-      );
+      emitter.addListener("onAddCardEvent", (event: WalletEvent) => {
+        match(event)
+          .with({ name: "signatureData" }, ({ data }) => {
+            fetchInAppProvisioningData(data)
+              .then((data) => NativeModule.setInAppProvisioningData(data))
+              .catch((error) => {
+                reject(error);
+                removeAllListeners();
+              });
+          })
+          .with({ name: "error" }, ({ data }) => {
+            reject(new Error(data));
+            removeAllListeners();
+          })
+          .with({ name: "finished" }, ({ data }) => {
+            resolve(data);
+            removeAllListeners();
+          })
+          .exhaustive();
+      });
 
       NativeModule.addCard(data);
     }),

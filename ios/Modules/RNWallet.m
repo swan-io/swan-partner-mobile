@@ -33,18 +33,18 @@ RCT_EXPORT_MODULE()
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-  return @[@"onWalletEvent"];
+  return @[@"onAddCardEvent"];
 }
 
 - (void)sendEvent:(nonnull NSString *)name
-             data:(nonnull NSDictionary *)data {
+             data:(nonnull id)data {
   if (hasListeners) {
-    [self sendEventWithName:@"onWalletEvent" body:@{ @"name": name, @"data": data }];
+    [self sendEventWithName:@"onAddCardEvent" body:@{ @"name": name, @"data": data }];
   }
 }
 
 - (void)sendErrorEvent:(nonnull NSString *)message {
-  [self sendEvent:@"error" data:@{ @"message": message }];
+  [self sendEvent:@"error" data:message];
 }
 
 // https://stackoverflow.com/a/9084784
@@ -239,7 +239,7 @@ RCT_EXPORT_METHOD(setInAppProvisioningData:(NSDictionary *)data) {
   bool success = error == nil;
 
   if (success || error.code == PKInvalidDataError) {
-    [self sendEvent:@"finished" data:@{ @"success": @(success) }];
+    [self sendEvent:@"finished" data:@(success)];
   } else {
     [self sendErrorEvent:[error localizedDescription]];
   }
