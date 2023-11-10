@@ -70,15 +70,8 @@ export const Wallet = {
 
       emitter.addListener("addCardEvent", (event: AddCardEvent) => {
         match(event)
-          .with({ type: "setCardInfos" }, ({ certificates, nonce, nonceSignature }) => {
-            fetchCardInfo({
-              nonceSignature,
-              nonce,
-              certificates: certificates.map((value, index) => ({
-                key: index === 0 ? "LEAF" : "INTERMEDIATE",
-                value,
-              })),
-            })
+          .with({ type: "setCardInfos" }, (signatureData) => {
+            fetchCardInfo(signatureData)
               .then((info) => NativeModule.setCardInfo(info))
               .catch((error) => {
                 reject(error);
