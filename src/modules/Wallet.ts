@@ -49,7 +49,7 @@ export type Card = {
 
 const NativeModule = NativeModules.RNWallet as {
   getCards: () => Promise<Card[]>;
-  openCardInWallet: (passURL: string) => Promise<void>;
+  openCard: (passURL: string) => Promise<void>;
   addCard: (data: AddCardData) => void;
   setCardInfo: (info: CardInfo) => void;
 };
@@ -59,12 +59,14 @@ const emitter = new NativeEventEmitter(NativeModule);
 
 export const Wallet = {
   getCards: () => NativeModule.getCards(),
-  openCardInWallet: (passURL: string) => NativeModule.openCardInWallet(passURL),
+  openCard: (passURL: string) => NativeModule.openCard(passURL),
 
   addCard: ({
     fetchCardInfo,
     ...data
-  }: AddCardData & { fetchCardInfo: (signatureData?: SignatureData) => Promise<CardInfo> }) =>
+  }: AddCardData & {
+    fetchCardInfo: (signatureData?: SignatureData) => Promise<CardInfo>;
+  }) =>
     new Promise<AddCardResponseType>((resolve, reject) => {
       emitter.removeAllListeners("addCardEvent");
 

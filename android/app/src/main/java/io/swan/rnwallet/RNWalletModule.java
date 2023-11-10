@@ -109,7 +109,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
   }
 
   @ReactMethod
-  public void openCardInWallet(final String token, final Promise promise) {
+  public void openCard(final String token, final Promise promise) {
     ViewTokenRequest request = new ViewTokenRequest.Builder()
       .setIssuerTokenId(token)
       .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)

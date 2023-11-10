@@ -67,9 +67,8 @@ RCT_EXPORT_MODULE()
   return [NSString stringWithString:hex];
 }
 
-RCT_REMAP_METHOD(getCards,
-                 getCardsWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(getCards:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
   if (![PKAddPaymentPassViewController canAddPaymentPass]) {
     return reject(@"wallet_error", @"Adding payment pass is not allowed", nil);
   }
@@ -126,10 +125,9 @@ RCT_REMAP_METHOD(getCards,
   resolve(cards);
 }
 
-RCT_REMAP_METHOD(openCardInWallet,
-                 openCardInWalletWithPassURL:(NSString *)passURL
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(openCard:(NSString *)passURL
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
   NSURL * _Nullable url = [[NSURL alloc] initWithString:passURL];
 
   if (url == nil) {

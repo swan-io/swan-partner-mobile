@@ -133,7 +133,7 @@ const ListItem = ({
 
   const handleShowCard = React.useCallback(() => {
     if (isNotNullish(passURLOrToken)) {
-      Wallet.openCardInWallet(passURLOrToken).catch((error: Error) => {
+      Wallet.openCard(passURLOrToken).catch((error: Error) => {
         handleErrorWithAlert(error);
       });
     }

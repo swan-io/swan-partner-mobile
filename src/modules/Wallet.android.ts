@@ -5,18 +5,20 @@ import { AddCardData, AddCardResponseType, Card, CardInfo, WalletModuleDefinitio
 
 const NativeModule = NativeModules.RNWallet as {
   getCards: () => Promise<Card[]>;
-  openCardInWallet: (token: string) => Promise<void>;
+  openCard: (token: string) => Promise<void>;
   addCard: (data: AddCardData & { opc: string }) => Promise<AddCardResponseType>;
 };
 
 export const Wallet: WalletModuleDefinition = {
   getCards: () => NativeModule.getCards(),
-  openCardInWallet: (token: string) => NativeModule.openCardInWallet(token),
+  openCard: (token: string) => NativeModule.openCard(token),
 
   addCard: async ({
     fetchCardInfo,
     ...data
-  }: AddCardData & { fetchCardInfo: () => Promise<CardInfo> }) => {
+  }: AddCardData & {
+    fetchCardInfo: () => Promise<CardInfo>;
+  }) => {
     const {
       activationData,
       encryptedData,
