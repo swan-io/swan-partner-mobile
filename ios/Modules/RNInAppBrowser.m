@@ -54,11 +54,10 @@ RCT_EXPORT_MODULE();
   [self handleOnClose];
 }
 
-RCT_REMAP_METHOD(open,
-                 openWithUrl:(NSString * _Nonnull)url
-                 options:(NSDictionary * _Nonnull)options
-                 resolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(open:(NSString * _Nonnull)url
+                  options:(NSDictionary * _Nonnull)options
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
   if (_safariViewController != nil) {
     return reject(@"in_app_browser_visible", @"An instance of the in-app browser is already visible", nil);
   }

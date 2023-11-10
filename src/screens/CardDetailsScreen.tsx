@@ -62,7 +62,7 @@ export const CardDetailsScreen = ({
           cardSuffix: lastFourDigits,
           identifier: maybeWalletCard?.identifier,
 
-          fetchCardInfo: (signatureData) => {
+          fetchInAppProvisioningData: (signatureData) => {
             return getClient()
               .query(GetDigitalCardsEncryptedInfoDocument, {
                 cardId,
@@ -92,8 +92,8 @@ export const CardDetailsScreen = ({
           },
         }),
       )
-      .then((result) => {
-        if (result === "success") {
+      .then((success) => {
+        if (success) {
           goBack();
         }
       })

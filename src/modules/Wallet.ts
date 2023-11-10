@@ -1,20 +1,21 @@
 import { NativeEventEmitter, NativeModules } from "react-native";
 import { match } from "ts-pattern";
 
-export type AddCardResponseType = "cancel" | "success";
-type CertificateKeyType = "LEAF" | "INTERMEDIATE";
+type Certificate = {
+  key: "LEAF" | "INTERMEDIATE";
+  value: string;
+};
 
 type SignatureData = {
-  certificates: { key: CertificateKeyType; value: string }[];
+  certificates: Certificate[];
   nonce: string;
   nonceSignature: string;
 };
 
-type AddCardEvent =
-  | { type: "setCardInfos"; certificates: string[]; nonce: string; nonceSignature: string }
-  | { type: "error"; message: string }
-  | { type: "cancel" }
-  | { type: "success" };
+type WalletEvent =
+  | { name: "signatureData"; data: SignatureData }
+  | { name: "error"; data: string }
+  | { name: "finished"; data: boolean };
 
 export type AddCardData = {
   cardHolderName: string;
@@ -22,7 +23,7 @@ export type AddCardData = {
   identifier?: string;
 };
 
-export type CardInfo = {
+export type InAppProvisioningData = {
   activationData: string;
   encryptedData: string;
   ephemeralPublicKey: string;
@@ -40,50 +41,45 @@ export type Card = {
 
 const NativeModule = NativeModules.RNWallet as {
   getCards: () => Promise<Card[]>;
-  openCardInWallet: (passURL: string) => Promise<void>;
+  openCard: (passURL: string) => Promise<void>;
   addCard: (data: AddCardData) => void;
-  setCardInfo: (info: CardInfo) => void;
+  setInAppProvisioningData: (data: InAppProvisioningData) => void;
 };
 
 // @ts-expect-error
 const emitter = new NativeEventEmitter(NativeModule);
+const removeAllListeners = () => emitter.removeAllListeners("onAddCardEvent");
 
 export const Wallet = {
-  getCards: () => NativeModule.getCards(),
-  openCardInWallet: (passURL: string) => NativeModule.openCardInWallet(passURL),
+  getCards: (): Promise<Card[]> => NativeModule.getCards(),
+  openCard: (passURL: string): Promise<void> => NativeModule.openCard(passURL),
 
   addCard: ({
-    fetchCardInfo,
+    fetchInAppProvisioningData,
     ...data
-  }: AddCardData & { fetchCardInfo: (signatureData?: SignatureData) => Promise<CardInfo> }) =>
-    new Promise<AddCardResponseType>((resolve, reject) => {
-      emitter.removeAllListeners("addCardEvent");
+  }: AddCardData & {
+    fetchInAppProvisioningData: (signatureData?: SignatureData) => Promise<InAppProvisioningData>;
+  }) =>
+    new Promise<boolean>((resolve, reject) => {
+      removeAllListeners();
 
-      emitter.addListener("addCardEvent", (event: AddCardEvent) => {
+      emitter.addListener("onAddCardEvent", (event: WalletEvent) => {
         match(event)
-          .with({ type: "setCardInfos" }, ({ certificates, nonce, nonceSignature }) => {
-            fetchCardInfo({
-              nonceSignature,
-              nonce,
-              certificates: certificates.map((value, index) => ({
-                key: index === 0 ? "LEAF" : "INTERMEDIATE",
-                value,
-              })),
-            })
-              .then((info) => NativeModule.setCardInfo(info))
+          .with({ name: "signatureData" }, ({ data }) => {
+            fetchInAppProvisioningData(data)
+              .then((data) => NativeModule.setInAppProvisioningData(data))
               .catch((error) => {
                 reject(error);
-                emitter.removeAllListeners("addCardEvent");
+                removeAllListeners();
               });
           })
-          .with({ type: "error" }, ({ message }) => {
-            const error = new Error(message);
-            reject(error);
-            emitter.removeAllListeners("addCardEvent");
+          .with({ name: "error" }, ({ data }) => {
+            reject(new Error(data));
+            removeAllListeners();
           })
-          .with({ type: "cancel" }, { type: "success" }, ({ type }) => {
-            resolve(type);
-            emitter.removeAllListeners("addCardEvent");
+          .with({ name: "finished" }, ({ data }) => {
+            resolve(data);
+            removeAllListeners();
           })
           .exhaustive();
       });

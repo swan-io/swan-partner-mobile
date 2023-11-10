@@ -1,22 +1,24 @@
 import { Buffer } from "buffer";
 import { NativeModules } from "react-native";
 import { isNotNullishOrEmpty } from "../utils/nullish";
-import { AddCardData, AddCardResponseType, Card, CardInfo, WalletModuleDefinition } from "./Wallet";
+import { AddCardData, Card, InAppProvisioningData, WalletModuleDefinition } from "./Wallet";
 
 const NativeModule = NativeModules.RNWallet as {
   getCards: () => Promise<Card[]>;
-  openCardInWallet: (token: string) => Promise<void>;
-  addCard: (data: AddCardData & { opc: string }) => Promise<AddCardResponseType>;
+  openCard: (token: string) => Promise<void>;
+  addCard: (data: AddCardData & { opc: string }) => Promise<boolean>;
 };
 
 export const Wallet: WalletModuleDefinition = {
   getCards: () => NativeModule.getCards(),
-  openCardInWallet: (token: string) => NativeModule.openCardInWallet(token),
+  openCard: (token: string) => NativeModule.openCard(token),
 
   addCard: async ({
-    fetchCardInfo,
+    fetchInAppProvisioningData,
     ...data
-  }: AddCardData & { fetchCardInfo: () => Promise<CardInfo> }) => {
+  }: AddCardData & {
+    fetchInAppProvisioningData: () => Promise<InAppProvisioningData>;
+  }) => {
     const {
       activationData,
       encryptedData,
@@ -24,7 +26,7 @@ export const Wallet: WalletModuleDefinition = {
       iv,
       oaepHashingAlgorithm,
       publicKeyFingerprint,
-    } = await fetchCardInfo();
+    } = await fetchInAppProvisioningData();
 
     return NativeModule.addCard({
       ...data,
