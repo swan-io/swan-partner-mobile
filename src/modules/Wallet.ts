@@ -1,7 +1,7 @@
 import { NativeModules } from "react-native";
 
 export type Card = {
-  FPANSuffix: string;
+  lastFourDigits: string;
   canBeAdded: boolean;
   passURLOrToken?: string;
 };

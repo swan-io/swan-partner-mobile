@@ -86,7 +86,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
             for (TokenInfo token : task.getResult()) {
               final WritableMap card = Arguments.createMap();
 
-              card.putString("FPANSuffix", token.getFpanLastFour());
+              card.putString("lastFourDigits", token.getFpanLastFour());
               card.putString("passURLOrToken", token.getIssuerTokenId());
               card.putBoolean("canBeAdded", false); // card already in wallet
 

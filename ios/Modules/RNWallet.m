@@ -75,7 +75,7 @@ RCT_EXPORT_METHOD(getCards:(RCTPromiseResolveBlock)resolve
     bool canBeAdded = [PKAddPaymentPassViewController canAddPaymentPass];
 
     NSMutableDictionary *card = [[NSMutableDictionary alloc] initWithDictionary:@{
-      @"FPANSuffix": [paymentPass primaryAccountNumberSuffix],
+      @"lastFourDigits": [paymentPass primaryAccountNumberSuffix],
     }];
 
     if (passURL != nil) {

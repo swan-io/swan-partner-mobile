@@ -249,7 +249,7 @@ export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps
         }
 
         const cardInWallet = cardsInWallet.cards.find(
-          ({ FPANSuffix }) => lastFourDigits === FPANSuffix,
+          (card) => lastFourDigits === card.lastFourDigits,
         );
 
         const canBeAdded = cardInWallet?.canBeAdded ?? true;
