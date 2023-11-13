@@ -55,8 +55,8 @@ export const CardDetailsScreen = ({
 
   const onWalletButtonPress = React.useCallback(() => {
     Wallet.getSignatureData({
-      cardHolderName: holderName,
-      cardSuffix: lastFourDigits,
+      holderName,
+      lastFourDigits,
     })
       .then((signatureData) =>
         getClient()

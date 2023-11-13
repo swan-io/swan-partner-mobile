@@ -111,10 +111,10 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
 
   @ReactMethod
   public void addCard(final ReadableMap data, final Promise promise) {
-    @Nullable String cardHolderName = data.getString("cardHolderName");
-    @Nullable String cardSuffix = data.getString("cardSuffix");
+    @Nullable String holderName = data.getString("holderName");
+    @Nullable String lastFourDigits = data.getString("lastFourDigits");
 
-    if (cardHolderName == null || cardSuffix == null) {
+    if (holderName == null || lastFourDigits == null) {
       promise.reject("ADD_CARD_ERROR", "Input is not correctly formatted");
       return;
     }
@@ -126,12 +126,12 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
       return;
     }
 
-    @Nullable String activationData = data.getString("encryptedData");
+    @Nullable String activationData = data.getString("activationData");
     @Nullable String encryptedData = data.getString("encryptedData");
-    @Nullable String iv = data.getString("iv");
-    @Nullable String publicKeyFingerprint = data.getString("publicKeyFingerprint");
     @Nullable String ephemeralPublicKey = data.getString("ephemeralPublicKey");
+    @Nullable String iv = data.getString("iv");
     @Nullable String oaepHashingAlgorithm = data.getString("oaepHashingAlgorithm");
+    @Nullable String publicKeyFingerprint = data.getString("publicKeyFingerprint");
 
     JSONObject opcJson = new JSONObject();
 
@@ -146,9 +146,13 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
         oaepHashingAlgorithm != null && oaepHashingAlgorithm.contains("SHA256") ? "SHA256" : "SHA512");
 
       opcJson.put("cardInfo", info);
-      opcJson.put("tokenizationAuthenticationValue",
-        activationData != null ? activationData : JSONObject.NULL);
-    } catch (JSONException ignored) {
+
+      if (activationData != null) {
+        opcJson.put("tokenizationAuthenticationValue", activationData);
+      }
+    } catch (JSONException exception) {
+      promise.reject(exception);
+      return;
     }
 
     byte[] opc = Base64.encode(opcJson.toString().getBytes(), Base64.DEFAULT);
@@ -158,7 +162,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
       .setNetwork(TapAndPay.CARD_NETWORK_MASTERCARD)
       .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)
       .setDisplayName("Swan card")
-      .setLastDigits(cardSuffix)
+      .setLastDigits(lastFourDigits)
       .build();
 
     mPromise = promise;

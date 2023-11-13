@@ -18,8 +18,8 @@ type SignatureData = {
 };
 
 type GetSignatureDataInput = {
-  cardHolderName: string;
-  cardSuffix: string;
+  holderName: string;
+  lastFourDigits: string;
 };
 
 type AddCardInput = {

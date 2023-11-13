@@ -116,19 +116,20 @@ RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
     return reject(@"wallet_error", @"Could not create configuration", nil);
   }
 
-  NSString * _Nullable cardHolderName = [data objectForKey:@"cardHolderName"];
-  NSString * _Nullable cardSuffix = [data objectForKey:@"cardSuffix"];
+  NSString * _Nullable holderName = [data objectForKey:@"holderName"];
+  NSString * _Nullable lastFourDigits = [data objectForKey:@"lastFourDigits"];
 
-  if (cardHolderName == nil || cardSuffix == nil) {
+  if (holderName == nil || lastFourDigits == nil) {
     return reject(@"wallet_error", @"addCard input is not correctly formatted", nil);
   }
 
-  [config setCardholderName:cardHolderName];
-  [config setPrimaryAccountSuffix:cardSuffix];
+  [config setCardholderName:holderName];
+  [config setPrimaryAccountSuffix:lastFourDigits];
 
   for (PKPaymentPass *paymentPass in [self paymentPasses]) {
-    if ([cardSuffix isEqualToString:[paymentPass primaryAccountNumberSuffix]])
+    if ([lastFourDigits isEqualToString:[paymentPass primaryAccountNumberSuffix]]) {
       [config setPrimaryAccountIdentifier:[paymentPass primaryAccountIdentifier]];
+    }
   }
 
   _viewController = [[PKAddPaymentPassViewController alloc] initWithRequestConfiguration:config delegate:self];
