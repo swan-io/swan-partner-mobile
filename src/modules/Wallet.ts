@@ -1,5 +1,10 @@
-import { NativeEventEmitter, NativeModules } from "react-native";
-import { match } from "ts-pattern";
+import { NativeModules } from "react-native";
+
+export type Card = {
+  FPANSuffix: string;
+  canBeAdded: boolean;
+  passURLOrToken?: string;
+};
 
 type Certificate = {
   key: "LEAF" | "INTERMEDIATE";
@@ -12,80 +17,30 @@ type SignatureData = {
   nonceSignature: string;
 };
 
-type WalletEvent =
-  | { name: "signatureData"; data: SignatureData }
-  | { name: "error"; data: string }
-  | { name: "finished"; data: boolean };
-
-export type AddCardData = {
+type GetSignatureDataInput = {
   cardHolderName: string;
   cardSuffix: string;
-  identifier?: string;
 };
 
-export type InAppProvisioningData = {
+type AddCardInput = {
   activationData: string;
   encryptedData: string;
   ephemeralPublicKey: string;
   iv?: string | null;
-  publicKeyFingerprint?: string | null;
   oaepHashingAlgorithm?: string | null;
-};
-
-export type Card = {
-  FPANSuffix: string;
-  identifier: string;
-  passURL?: string;
-  canBeAdded: boolean;
+  publicKeyFingerprint?: string | null;
 };
 
 const NativeModule = NativeModules.RNWallet as {
   getCards: () => Promise<Card[]>;
-  showCard: (passURL: string) => Promise<void>;
-  addCard: (data: AddCardData) => void;
-  setInAppProvisioningData: (data: InAppProvisioningData) => void;
+  getSignatureData: (input: GetSignatureDataInput) => Promise<SignatureData | null>;
+  addCard: (input: AddCardInput) => Promise<boolean>;
+  showCard: (passURLOrToken: string) => Promise<void>;
 };
-
-// @ts-expect-error
-const emitter = new NativeEventEmitter(NativeModule);
-const removeAllListeners = () => emitter.removeAllListeners("onAddCardEvent");
 
 export const Wallet = {
-  getCards: (): Promise<Card[]> => NativeModule.getCards(),
-  showCard: (passURL: string): Promise<void> => NativeModule.showCard(passURL),
-
-  addCard: ({
-    fetchInAppProvisioningData,
-    ...data
-  }: AddCardData & {
-    fetchInAppProvisioningData: (signatureData?: SignatureData) => Promise<InAppProvisioningData>;
-  }) =>
-    new Promise<boolean>((resolve, reject) => {
-      removeAllListeners();
-
-      emitter.addListener("onAddCardEvent", (event: WalletEvent) => {
-        match(event)
-          .with({ name: "signatureData" }, ({ data }) => {
-            fetchInAppProvisioningData(data)
-              .then((data) => NativeModule.setInAppProvisioningData(data))
-              .catch((error) => {
-                reject(error);
-                removeAllListeners();
-              });
-          })
-          .with({ name: "error" }, ({ data }) => {
-            reject(new Error(data));
-            removeAllListeners();
-          })
-          .with({ name: "finished" }, ({ data }) => {
-            resolve(data);
-            removeAllListeners();
-          })
-          .exhaustive();
-      });
-
-      NativeModule.addCard(data);
-    }),
+  getCards: () => NativeModule.getCards(),
+  getSignatureData: (input: GetSignatureDataInput) => NativeModule.getSignatureData(input),
+  addCard: (input: AddCardInput) => NativeModule.addCard(input),
+  showCard: (passURLOrToken: string) => NativeModule.showCard(passURLOrToken),
 };
-
-export type WalletModuleDefinition = typeof Wallet;

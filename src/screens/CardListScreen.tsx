@@ -254,9 +254,8 @@ export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps
 
         const canBeAdded = cardInWallet?.canBeAdded ?? true;
         const designUrl = node.cardDesignUrl;
+        const passURLOrToken = cardInWallet?.passURLOrToken;
 
-        const passURLOrToken =
-          Platform.OS === "ios" ? cardInWallet?.passURL : cardInWallet?.identifier;
         const textColor =
           node.cardProduct.cardDesigns[0]?.cardBackground.cardTextColor ?? colors.white;
 

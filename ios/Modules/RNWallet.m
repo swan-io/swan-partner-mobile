@@ -23,6 +23,30 @@ RCT_EXPORT_MODULE()
   return dispatch_get_main_queue();
 }
 
+- (NSArray<PKPaymentPass *> *)paymentPasses {
+  PKPassLibrary *passLibrary = [PKPassLibrary new];
+  NSArray<PKPass *> *remotePasses = nil;
+
+  if (@available(iOS 13.4, *)) {
+    remotePasses = [passLibrary remoteSecureElementPasses];
+  } else {
+    remotePasses = [passLibrary remotePaymentPasses];
+  }
+
+  NSArray<PKPass *> *passes = [[passLibrary passes] arrayByAddingObjectsFromArray:remotePasses];
+  NSMutableArray<PKPaymentPass *> *paymentPasses = [NSMutableArray array];
+
+  for (PKPass *pass in passes) {
+    PKPaymentPass * _Nullable paymentPass = [pass paymentPass];
+
+    if (paymentPass != nil) {
+      [paymentPasses addObject:paymentPass];
+    }
+  }
+
+  return paymentPasses;
+}
+
 // https://stackoverflow.com/a/9084784
 - (NSString*)dataToHex:(nonnull NSData *)data {
   const unsigned char *buffer = (const unsigned char *)[data bytes];
@@ -43,81 +67,40 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(getCards:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-  if (![PKAddPaymentPassViewController canAddPaymentPass]) {
-    return reject(@"wallet_error", @"Adding payment pass is not allowed", nil);
-  }
-
-  PKPassLibrary *passLibrary = [PKPassLibrary new];
-  NSArray<PKPass *> *remotePasses = nil;
-
-  if (@available(iOS 13.4, *)) {
-    remotePasses = [passLibrary remoteSecureElementPasses];
-  } else {
-    remotePasses = [passLibrary remotePaymentPasses];
-  }
-
-  NSArray<PKPass *> *passes = [[passLibrary passes] arrayByAddingObjectsFromArray:remotePasses];
   NSMutableArray<NSDictionary *> *cards = [NSMutableArray array];
+  PKPassLibrary *passLibrary = [PKPassLibrary new];
 
-  for (PKPass *pass in passes) {
-    PKPaymentPass * _Nullable paymentPass = [pass paymentPass];
-
-    if (paymentPass == nil) {
-      continue;
-    }
-
-    NSString * _Nullable identifier = [paymentPass primaryAccountIdentifier];
-    NSString * _Nullable suffix = [paymentPass primaryAccountNumberSuffix];
-
-    if (identifier == nil || suffix == nil) {
-      continue;
-    }
+  for (PKPaymentPass *paymentPass in [self paymentPasses]) {
+    NSURL * _Nullable passURL = [paymentPass passURL];
+    bool canBeAdded = [PKAddPaymentPassViewController canAddPaymentPass];
 
     NSMutableDictionary *card = [[NSMutableDictionary alloc] initWithDictionary:@{
-      @"FPANSuffix": suffix,
-      @"identifier": identifier,
+      @"FPANSuffix": [paymentPass primaryAccountNumberSuffix],
     }];
 
-    NSURL * _Nullable passURL = [pass passURL];
-
     if (passURL != nil) {
-      NSString * _Nullable strPassURL = [passURL absoluteString];
+      NSString * _Nullable passURLOrToken = [passURL absoluteString];
 
-      if (strPassURL != nil) {
-        [card setObject:strPassURL forKey:@"passURL"];
+      if (passURLOrToken != nil) {
+        [card setObject:passURLOrToken forKey:@"passURLOrToken"];
       }
     }
 
-    if (@available(iOS 13.4, *)) {
-      [card setObject:@([passLibrary canAddSecureElementPassWithPrimaryAccountIdentifier:identifier]) forKey:@"canBeAdded"];
-    } else {
-      [card setObject:@([passLibrary canAddPaymentPassWithPrimaryAccountIdentifier:identifier]) forKey:@"canBeAdded"];
+    if (canBeAdded) {
+      NSString *identifier = [paymentPass primaryAccountIdentifier];
+
+      if (@available(iOS 13.4, *)) {
+        canBeAdded = [passLibrary canAddSecureElementPassWithPrimaryAccountIdentifier:identifier];
+      } else {
+        canBeAdded = [passLibrary canAddPaymentPassWithPrimaryAccountIdentifier:identifier];
+      }
     }
 
+    [card setObject:@(canBeAdded) forKey:@"canBeAdded"];
     [cards addObject:card];
   }
 
   resolve(cards);
-}
-
-RCT_EXPORT_METHOD(showCard:(NSString *)passURL
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
-  NSURL * _Nullable url = [[NSURL alloc] initWithString:passURL];
-
-  if (url == nil) {
-    return reject(@"wallet_error", @"Invalid pass URL", nil);
-  }
-
-  [[UIApplication sharedApplication] openURL:url
-                                     options:@{}
-                           completionHandler:^(BOOL success) {
-    if (success) {
-      resolve(nil);
-    } else {
-      reject(@"wallet_error", @"Could not open pass", nil);
-    }
-  }];
 }
 
 RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
@@ -134,7 +117,6 @@ RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
   }
 
   NSString * _Nullable cardHolderName = [data objectForKey:@"cardHolderName"];
-  NSString * _Nullable identifier = [data objectForKey:@"identifier"];
   NSString * _Nullable cardSuffix = [data objectForKey:@"cardSuffix"];
 
   if (cardHolderName == nil || cardSuffix == nil) {
@@ -144,8 +126,9 @@ RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
   [config setCardholderName:cardHolderName];
   [config setPrimaryAccountSuffix:cardSuffix];
 
-  if (identifier != nil) {
-    [config setPrimaryAccountIdentifier:identifier];
+  for (PKPaymentPass *paymentPass in [self paymentPasses]) {
+    if ([cardSuffix isEqualToString:[paymentPass primaryAccountNumberSuffix]])
+      [config setPrimaryAccountIdentifier:[paymentPass primaryAccountIdentifier]];
   }
 
   _viewController = [[PKAddPaymentPassViewController alloc] initWithRequestConfiguration:config delegate:self];
@@ -229,6 +212,26 @@ RCT_EXPORT_METHOD(addCard:(NSDictionary *)data
     _resolve(@(error == nil));
     _resolve = nil;
   }
+}
+
+RCT_EXPORT_METHOD(showCard:(NSString *)passURL
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+  NSURL * _Nullable url = [[NSURL alloc] initWithString:passURL];
+
+  if (url == nil) {
+    return reject(@"wallet_error", @"Invalid pass URL", nil);
+  }
+
+  [[UIApplication sharedApplication] openURL:url
+                                     options:@{}
+                           completionHandler:^(BOOL success) {
+    if (success) {
+      resolve(nil);
+    } else {
+      reject(@"wallet_error", @"Could not open pass", nil);
+    }
+  }];
 }
 
 @end

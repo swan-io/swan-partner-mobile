@@ -51,7 +51,6 @@
     "@react-navigation/native": "6.1.9",
     "@react-navigation/native-stack": "6.9.17",
     "@urql/exchange-graphcache": "6.3.3",
-    "buffer": "6.0.3",
     "core-js": "3.33.2",
     "react": "18.2.0",
     "react-atomic-state": "1.2.7",

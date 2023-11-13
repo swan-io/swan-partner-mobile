@@ -87,7 +87,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
               final WritableMap card = Arguments.createMap();
 
               card.putString("FPANSuffix", token.getFpanLastFour());
-              card.putString("identifier", token.getIssuerTokenId());
+              card.putString("passURLOrToken", token.getIssuerTokenId());
               card.putBoolean("canBeAdded", false); // card already in wallet
 
               cards.pushMap(card);
@@ -98,36 +98,6 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
             @Nullable Exception exception = task.getException();
 
             promise.reject("GET_CARDS_ERROR",
-              exception != null ? exception.getMessage() : "Unknown error");
-          }
-        }
-      });
-  }
-
-  @ReactMethod
-  public void showCard(final String token, final Promise promise) {
-    ViewTokenRequest request = new ViewTokenRequest.Builder()
-      .setIssuerTokenId(token)
-      .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)
-      .build();
-
-    tapAndPayClient
-      .viewToken(request)
-      .addOnCompleteListener(new OnCompleteListener<PendingIntent>() {
-
-        @Override
-        public void onComplete(@NonNull Task<PendingIntent> task) {
-          if (task.isSuccessful()) {
-            try {
-              task.getResult().send();
-              promise.resolve(null);
-            } catch (PendingIntent.CanceledException exception) {
-              promise.reject("OPEN_CARD_IN_WALLET_ERROR", exception.getMessage());
-            }
-          } else {
-            @Nullable Exception exception = task.getException();
-
-            promise.reject("OPEN_CARD_IN_WALLET_ERROR",
               exception != null ? exception.getMessage() : "Unknown error");
           }
         }
@@ -214,5 +184,35 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
 
     // Remove promise so it cannot be reused
     mPromise = null;
+  }
+
+  @ReactMethod
+  public void showCard(final String token, final Promise promise) {
+    ViewTokenRequest request = new ViewTokenRequest.Builder()
+      .setIssuerTokenId(token)
+      .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)
+      .build();
+
+    tapAndPayClient
+      .viewToken(request)
+      .addOnCompleteListener(new OnCompleteListener<PendingIntent>() {
+
+        @Override
+        public void onComplete(@NonNull Task<PendingIntent> task) {
+          if (task.isSuccessful()) {
+            try {
+              task.getResult().send();
+              promise.resolve(null);
+            } catch (PendingIntent.CanceledException exception) {
+              promise.reject("OPEN_CARD_IN_WALLET_ERROR", exception.getMessage());
+            }
+          } else {
+            @Nullable Exception exception = task.getException();
+
+            promise.reject("OPEN_CARD_IN_WALLET_ERROR",
+              exception != null ? exception.getMessage() : "Unknown error");
+          }
+        }
+      });
   }
 }
