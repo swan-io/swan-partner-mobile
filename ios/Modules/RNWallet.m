@@ -124,7 +124,7 @@ RCT_EXPORT_METHOD(getCards:(RCTPromiseResolveBlock)resolve
   resolve(cards);
 }
 
-RCT_EXPORT_METHOD(openCard:(NSString *)passURL
+RCT_EXPORT_METHOD(showCard:(NSString *)passURL
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
   NSURL * _Nullable url = [[NSURL alloc] initWithString:passURL];

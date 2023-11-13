@@ -41,7 +41,7 @@ export type Card = {
 
 const NativeModule = NativeModules.RNWallet as {
   getCards: () => Promise<Card[]>;
-  openCard: (passURL: string) => Promise<void>;
+  showCard: (passURL: string) => Promise<void>;
   addCard: (data: AddCardData) => void;
   setInAppProvisioningData: (data: InAppProvisioningData) => void;
 };
@@ -52,7 +52,7 @@ const removeAllListeners = () => emitter.removeAllListeners("onAddCardEvent");
 
 export const Wallet = {
   getCards: (): Promise<Card[]> => NativeModule.getCards(),
-  openCard: (passURL: string): Promise<void> => NativeModule.openCard(passURL),
+  showCard: (passURL: string): Promise<void> => NativeModule.showCard(passURL),
 
   addCard: ({
     fetchInAppProvisioningData,
