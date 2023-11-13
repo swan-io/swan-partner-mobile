@@ -5,14 +5,13 @@
 
 @interface RNWallet() <PKAddPaymentPassViewControllerDelegate>
 
-@property (nonatomic, strong) PKAddPaymentPassViewController *addPaymentPassViewController;
+@property (nonatomic, strong) PKAddPaymentPassViewController *viewController;
 @property (nonatomic, strong) void (^completionHandler)(PKAddPaymentPassRequest *request);
+@property (nonatomic, strong) void (^resolve)(id result);
 
 @end
 
-@implementation RNWallet {
-  bool hasListeners;
-}
+@implementation RNWallet
 
 RCT_EXPORT_MODULE()
 
@@ -22,29 +21,6 @@ RCT_EXPORT_MODULE()
 
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
-}
-
-- (void)startObserving {
-  hasListeners = YES;
-}
-
-- (void)stopObserving {
-  hasListeners = NO;
-}
-
-- (NSArray<NSString *> *)supportedEvents {
-  return @[@"onAddCardEvent"];
-}
-
-- (void)sendEvent:(nonnull NSString *)name
-             data:(nonnull id)data {
-  if (hasListeners) {
-    [self sendEventWithName:@"onAddCardEvent" body:@{ @"name": name, @"data": data }];
-  }
-}
-
-- (void)sendErrorEvent:(nonnull NSString *)message {
-  [self sendEvent:@"error" data:message];
 }
 
 // https://stackoverflow.com/a/9084784
@@ -133,7 +109,9 @@ RCT_EXPORT_METHOD(showCard:(NSString *)passURL
     return reject(@"wallet_error", @"Invalid pass URL", nil);
   }
 
-  [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
+  [[UIApplication sharedApplication] openURL:url
+                                     options:@{}
+                           completionHandler:^(BOOL success) {
     if (success) {
       resolve(nil);
     } else {
@@ -142,15 +120,17 @@ RCT_EXPORT_METHOD(showCard:(NSString *)passURL
   }];
 }
 
-RCT_EXPORT_METHOD(addCard:(NSDictionary *)data) {
+RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
   if (![PKAddPaymentPassViewController canAddPaymentPass]) {
-    return [self sendErrorEvent:@"Adding payment pass is not allowed"];
+    return reject(@"wallet_error", @"Adding payment pass is not allowed", nil);
   }
 
   PKAddPaymentPassRequestConfiguration * _Nullable config = [[PKAddPaymentPassRequestConfiguration alloc] initWithEncryptionScheme:PKEncryptionSchemeECC_V2];
 
   if (config == nil) {
-    return [self sendErrorEvent:@"Could not create configuration"];
+    return reject(@"wallet_error", @"Could not create configuration", nil);
   }
 
   NSString * _Nullable cardHolderName = [data objectForKey:@"cardHolderName"];
@@ -158,7 +138,7 @@ RCT_EXPORT_METHOD(addCard:(NSDictionary *)data) {
   NSString * _Nullable cardSuffix = [data objectForKey:@"cardSuffix"];
 
   if (cardHolderName == nil || cardSuffix == nil) {
-    return [self sendErrorEvent:@"addCard input is not correctly formatted"];
+    return reject(@"wallet_error", @"addCard input is not correctly formatted", nil);
   }
 
   [config setCardholderName:cardHolderName];
@@ -168,14 +148,16 @@ RCT_EXPORT_METHOD(addCard:(NSDictionary *)data) {
     [config setPrimaryAccountIdentifier:identifier];
   }
 
-  _addPaymentPassViewController = [[PKAddPaymentPassViewController alloc] initWithRequestConfiguration:config delegate:self];
+  _viewController = [[PKAddPaymentPassViewController alloc] initWithRequestConfiguration:config delegate:self];
 
-  if (_addPaymentPassViewController == nil) {
-    return [self sendErrorEvent:@"Could not create payment view"];
+  if (_viewController == nil) {
+    return reject(@"wallet_error", @"Could not create view controller", nil);
   }
 
-  [RCTPresentedViewController() presentViewController:_addPaymentPassViewController animated:true completion:nil];
-  _addPaymentPassViewController.delegate = self;
+  _resolve = resolve;
+
+  [RCTPresentedViewController() presentViewController:_viewController animated:true completion:nil];
+  [_viewController setDelegate:self];
 }
 
 - (void)addPaymentPassViewController:(nonnull PKAddPaymentPassViewController *)controller
@@ -201,12 +183,18 @@ RCT_EXPORT_METHOD(addCard:(NSDictionary *)data) {
   };
 
   _completionHandler = handler;
-  [self sendEvent:@"signatureData" data:data];
+
+  if (_resolve != nil) {
+    _resolve(data);
+    _resolve = nil;
+  }
 }
 
-RCT_EXPORT_METHOD(setInAppProvisioningData:(NSDictionary *)data) {
+RCT_EXPORT_METHOD(addCard:(NSDictionary *)data
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
   if (![PKAddPaymentPassViewController canAddPaymentPass]) {
-    return [self sendErrorEvent:@"Adding payment pass is not allowed"];
+    return reject(@"wallet_error", @"Adding payment pass is not allowed", nil);
   }
 
   NSString * _Nullable activationData = [data objectForKey:@"activationData"];
@@ -214,7 +202,7 @@ RCT_EXPORT_METHOD(setInAppProvisioningData:(NSDictionary *)data) {
   NSString * _Nullable ephemeralPublicKey = [data objectForKey:@"ephemeralPublicKey"];
 
   if (activationData == nil || encryptedData == nil || ephemeralPublicKey == nil) {
-    return [self sendErrorEvent:@"setInAppProvisioningData input is not correctly formatted"];
+    return reject(@"wallet_error", @"addCard input is not correctly formatted", nil);
   }
 
   PKAddPaymentPassRequest *request = [PKAddPaymentPassRequest new];
@@ -223,25 +211,23 @@ RCT_EXPORT_METHOD(setInAppProvisioningData:(NSDictionary *)data) {
   [request setEncryptedPassData:[[NSData alloc] initWithBase64EncodedString:encryptedData options:NSDataBase64DecodingIgnoreUnknownCharacters]];
   [request setEphemeralPublicKey:[[NSData alloc] initWithBase64EncodedString:ephemeralPublicKey options:NSDataBase64DecodingIgnoreUnknownCharacters]];
 
+  _resolve = resolve;
   _completionHandler(request);
 }
 
 - (void)addPaymentPassViewController:(nonnull PKAddPaymentPassViewController *)controller
           didFinishAddingPaymentPass:(nullable PKPaymentPass *)pass
                                error:(nullable NSError *)error {
-  if (_addPaymentPassViewController != nil) {
+  if (_viewController != nil) {
     [RCTPresentedViewController() dismissViewControllerAnimated:true completion:^{
-      self->_addPaymentPassViewController = nil;
+      self->_viewController = nil;
       self->_completionHandler = nil;
     }];
   }
 
-  bool success = error == nil;
-
-  if (success || error.code == PKInvalidDataError) {
-    [self sendEvent:@"finished" data:@(success)];
-  } else {
-    [self sendErrorEvent:[error localizedDescription]];
+  if (_resolve != nil) {
+    _resolve(@(error == nil));
+    _resolve = nil;
   }
 }
 

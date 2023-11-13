@@ -3,6 +3,7 @@ package io.swan.rnwallet;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.util.Base64;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,9 +26,10 @@ import com.google.android.gms.tapandpay.issuer.ViewTokenRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.HashMap;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
-import java.util.Map;
 
 @ReactModule(name = RNWalletModule.NAME)
 public class RNWalletModule extends ReactContextBaseJavaModule implements ActivityEventListener {
@@ -54,6 +56,21 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
 
   @Override
   public void onNewIntent(Intent intent) {}
+
+  public Object base64ToJsonHex(@Nullable String base64) {
+    if (base64 == null) {
+      return JSONObject.NULL;
+    }
+
+    byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+    StringBuilder hex = new StringBuilder();
+
+    for (byte aByte : bytes) {
+      hex.append(String.format("%02x", aByte));
+    }
+
+    return hex.toString();
+  }
 
   @ReactMethod
   public void getCards(final Promise promise) {
@@ -118,12 +135,16 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
   }
 
   @ReactMethod
+  public void getSignatureData(final ReadableMap data, final Promise promise) {
+    promise.resolve(null); // Not needed on Android, only for API parity
+  }
+
+  @ReactMethod
   public void addCard(final ReadableMap data, final Promise promise) {
     @Nullable String cardHolderName = data.getString("cardHolderName");
     @Nullable String cardSuffix = data.getString("cardSuffix");
-    @Nullable String opc = data.getString("opc");
 
-    if (cardHolderName == null || cardSuffix == null || opc == null) {
+    if (cardHolderName == null || cardSuffix == null) {
       promise.reject("ADD_CARD_ERROR", "Input is not correctly formatted");
       return;
     }
@@ -135,8 +156,35 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
       return;
     }
 
+    @Nullable String activationData = data.getString("encryptedData");
+    @Nullable String encryptedData = data.getString("encryptedData");
+    @Nullable String iv = data.getString("iv");
+    @Nullable String publicKeyFingerprint = data.getString("publicKeyFingerprint");
+    @Nullable String ephemeralPublicKey = data.getString("ephemeralPublicKey");
+    @Nullable String oaepHashingAlgorithm = data.getString("oaepHashingAlgorithm");
+
+    JSONObject opcJson = new JSONObject();
+
+    try {
+      JSONObject info = new JSONObject();
+
+      info.put("encryptedData", base64ToJsonHex(encryptedData));
+      info.put("iv", base64ToJsonHex(iv));
+      info.put("publicKeyFingerprint", base64ToJsonHex(publicKeyFingerprint));
+      info.put("encryptedKey", base64ToJsonHex(ephemeralPublicKey));
+      info.put("oaepHashingAlgorithm",
+        oaepHashingAlgorithm != null && oaepHashingAlgorithm.contains("SHA256") ? "SHA256" : "SHA512");
+
+      opcJson.put("cardInfo", info);
+      opcJson.put("tokenizationAuthenticationValue",
+        activationData != null ? activationData : JSONObject.NULL);
+    } catch (JSONException ignored) {
+    }
+
+    byte[] opc = Base64.encode(opcJson.toString().getBytes(), Base64.DEFAULT);
+
     PushTokenizeRequest request = new PushTokenizeRequest.Builder()
-      .setOpaquePaymentCard(opc.getBytes())
+      .setOpaquePaymentCard(opc)
       .setNetwork(TapAndPay.CARD_NETWORK_MASTERCARD)
       .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)
       .setDisplayName("Swan card")
