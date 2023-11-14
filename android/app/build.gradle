@@ -80,8 +80,8 @@ android {
         applicationId "io.swan.id"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1694438152
-        versionName "1.2.0"
+        versionCode 1699970354
+        versionName "1.2.1"
     }
     signingConfigs {
         debug {
