@@ -1,16 +1,16 @@
-query CardList(
-  $first: Int!
-  $after: String
-  $filters: CardFiltersInput
-  $orderBy: CardOrderByInput
-) {
+query CardList($first: Int!, $after: String) {
   projectInfo {
     id
     logoUri
     name
   }
 
-  cards(first: $first, after: $after, filters: $filters, orderBy: $orderBy) {
+  cards(
+    first: $first
+    after: $after
+    filters: { statuses: [Enabled, Processing] }
+    orderBy: { direction: Desc, field: createdAt }
+  ) {
     totalCount
 
     pageInfo {
@@ -84,12 +84,12 @@ mutation AddDigitalCard($input: AddDigitalCardInput!) {
 
 query GetDigitalCardsEncryptedInfo(
   $cardId: ID!
-  $filters: DigitalCardFiltersInput!
+  $digitalCardId: String!
   $signatureData: SignatureData
 ) {
   card(cardId: $cardId) {
     id
-    digitalCards(filters: $filters) {
+    digitalCards(filters: { id: $digitalCardId }) {
       edges {
         node {
           id

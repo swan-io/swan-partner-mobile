@@ -54,31 +54,22 @@ export const CardDetailsScreen = ({
   const insets = useSafeAreaInsets();
 
   const onWalletButtonPress = React.useCallback(() => {
-    Wallet.getSignatureData({
-      holderName,
-      lastFourDigits,
-    })
+    Wallet.getSignatureData({ holderName, lastFourDigits })
       .then((signatureData) =>
         getClient()
-          .query(GetDigitalCardsEncryptedInfoDocument, {
-            filters: { id: digitalCardId },
-            cardId,
-            signatureData,
-          })
+          .query(GetDigitalCardsEncryptedInfoDocument, { cardId, digitalCardId, signatureData })
           .toPromise(),
       )
       .then(parseOperationResult)
-      .then(({ card }) => {
-        const edges = card?.digitalCards.edges ?? [];
-        const node = edges.find(({ node }) => node.id === digitalCardId)?.node;
-
-        if (node?.__typename !== "PendingDigitalCard" || isNullish(node.inAppProvisioningData)) {
-          throw new Error("Could not find activation data");
-        }
-
-        return node.inAppProvisioningData;
-      })
-      .then((input) => Wallet.addCard(input))
+      .then((data) => data.card?.digitalCards.edges)
+      .then((edges) => edges?.find(({ node }) => node.id === digitalCardId)?.node)
+      .then((digitalCard) =>
+        digitalCard?.__typename !== "PendingDigitalCard" ||
+        isNullish(digitalCard.inAppProvisioningData)
+          ? Promise.reject(new Error("Could not find activation data"))
+          : digitalCard.inAppProvisioningData,
+      )
+      .then((inAppProvisioningData) => Wallet.addCard(inAppProvisioningData))
       .then((success) => {
         if (success) {
           goBack();

@@ -188,13 +188,9 @@ const ListItem = ({
 };
 
 export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps<"CardList">) => {
-  const [variables, setVariables] = React.useState<CardListQueryVariables>({
-    first: 10,
-    filters: { statuses: ["Enabled", "Processing"] },
-    orderBy: { direction: "Desc", field: "createdAt" },
-  });
-
   const insets = useSafeAreaInsets();
+
+  const [variables, setVariables] = React.useState<CardListQueryVariables>({ first: 10 });
   const { fetching, data } = useBasicQuery({ query: CardListDocument, variables });
 
   const [cardsInWallet, setCardsInWallet] = React.useState<
