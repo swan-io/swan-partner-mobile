@@ -66,7 +66,7 @@ export const CardDetailsScreen = ({
       .then((digitalCard) =>
         digitalCard?.__typename !== "PendingDigitalCard" ||
         isNullish(digitalCard.inAppProvisioningData)
-          ? Promise.reject(new Error("Could not find activation data"))
+          ? Promise.reject(new Error("Could not get in-app provisioning data"))
           : digitalCard.inAppProvisioningData,
       )
       .then((inAppProvisioningData) => Wallet.addCard(inAppProvisioningData))
