@@ -57,7 +57,28 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
   @Override
   public void onNewIntent(Intent intent) {}
 
-  public Object base64ToJsonHex(@Nullable String base64) {
+  private void keepPromisePending(final Promise promise) {
+    if (mPromise != null) {
+      mPromise.reject("wallet_error", "Promise aborted by incoming new operation");
+    }
+    mPromise = promise;
+  }
+
+  private void resolvePendingPromise(final Object data) {
+    if (mPromise != null) {
+      mPromise.resolve(data);
+      mPromise = null;
+    }
+  }
+
+  private void rejectPendingPromise(final String message) {
+    if (mPromise != null) {
+      mPromise.reject("wallet_error", message);
+      mPromise = null;
+    }
+  }
+
+  private Object base64ToJsonHex(@Nullable String base64) {
     if (base64 == null) {
       return JSONObject.NULL;
     }
@@ -97,7 +118,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
           } else {
             @Nullable Exception exception = task.getException();
 
-            promise.reject("GET_CARDS_ERROR",
+            promise.reject("wallet_error",
               exception != null ? exception.getMessage() : "Unknown error");
           }
         }
@@ -115,14 +136,14 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
     @Nullable String lastFourDigits = data.getString("lastFourDigits");
 
     if (holderName == null || lastFourDigits == null) {
-      promise.reject("ADD_CARD_ERROR", "Input is not correctly formatted");
+      promise.reject("wallet_error", "Input is not correctly formatted");
       return;
     }
 
     @Nullable Activity activity = getCurrentActivity();
 
     if (activity == null) {
-      promise.reject("ADD_CARD_ERROR", "Could not get current activity");
+      promise.reject("wallet_error", "Could not get current activity");
       return;
     }
 
@@ -151,7 +172,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
         opcJson.put("tokenizationAuthenticationValue", activationData);
       }
     } catch (JSONException exception) {
-      promise.reject(exception);
+      promise.reject("wallet_error", exception.getMessage());
       return;
     }
 
@@ -165,29 +186,21 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
       .setLastDigits(lastFourDigits)
       .build();
 
-    mPromise = promise;
+    keepPromisePending(promise);
     tapAndPayClient.pushTokenize(activity, request, REQUEST_CODE_PUSH_TOKENIZE);
   }
 
   @Override
   public void onActivityResult(Activity activity, int requestCode, int resultCode, @Nullable Intent intent) {
-    if (requestCode != REQUEST_CODE_PUSH_TOKENIZE || mPromise == null) {
-      return;
-    }
+    if (requestCode == REQUEST_CODE_PUSH_TOKENIZE) {
+      boolean success = resultCode == Activity.RESULT_OK;
 
-    switch (resultCode) {
-      case Activity.RESULT_OK:
-        mPromise.resolve(true);
-        break;
-      case Activity.RESULT_CANCELED:
-        mPromise.resolve(false);
-        break;
-      default:
-        mPromise.reject("ADD_CARD_ERROR", "Could not provision card");
+      if (success || resultCode == Activity.RESULT_CANCELED) {
+        resolvePendingPromise(success);
+      } else {
+        rejectPendingPromise("Could not provision card");
+      }
     }
-
-    // Remove promise so it cannot be reused
-    mPromise = null;
   }
 
   @ReactMethod
@@ -208,12 +221,12 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
               task.getResult().send();
               promise.resolve(null);
             } catch (PendingIntent.CanceledException exception) {
-              promise.reject("OPEN_CARD_IN_WALLET_ERROR", exception.getMessage());
+              promise.reject("wallet_error", exception.getMessage());
             }
           } else {
             @Nullable Exception exception = task.getException();
 
-            promise.reject("OPEN_CARD_IN_WALLET_ERROR",
+            promise.reject("wallet_error",
               exception != null ? exception.getMessage() : "Unknown error");
           }
         }

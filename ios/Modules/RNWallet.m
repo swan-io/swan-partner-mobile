@@ -6,8 +6,9 @@
 @interface RNWallet() <PKAddPaymentPassViewControllerDelegate>
 
 @property (nonatomic, strong) PKAddPaymentPassViewController *viewController;
-@property (nonatomic, strong) void (^completionHandler)(PKAddPaymentPassRequest *request);
+@property (nonatomic, strong) void (^onAddPaymentPassRequest)(PKAddPaymentPassRequest *request);
 @property (nonatomic, strong) void (^resolve)(id result);
+@property (nonatomic, strong) void (^reject)(NSString *, NSString *, NSError *);
 
 @end
 
@@ -21,6 +22,49 @@ RCT_EXPORT_MODULE()
 
 - (dispatch_queue_t)methodQueue {
   return dispatch_get_main_queue();
+}
+
+- (void)keepPromisePendingWithResolve:(RCTPromiseResolveBlock)resolve
+                               reject:(RCTPromiseRejectBlock)reject {
+  if (_reject != nil) {
+    _reject(@"wallet_error", @"Promise aborted by incoming new operation", nil);
+  }
+  _resolve = resolve;
+  _reject = reject;
+}
+
+- (void)resolvePendingPromiseWithData:(id)data {
+  if (_resolve != nil) {
+    _resolve(data);
+    _resolve = nil;
+    _reject = nil;
+  }
+}
+
+- (void)rejectPendingPromiseWithMessage:(NSString *)message {
+  if (_reject != nil) {
+    _reject(@"wallet_error", message, nil);
+    _resolve = nil;
+    _reject = nil;
+  }
+}
+
+// https://stackoverflow.com/a/9084784
+- (NSString *)dataToHex:(nonnull NSData *)data {
+  const unsigned char *buffer = (const unsigned char *)[data bytes];
+
+  if (!buffer) {
+    return [NSString string];
+  }
+
+  NSUInteger length = [data length];
+  NSMutableString *hex = [NSMutableString stringWithCapacity:(length * 2)];
+
+  for (int i = 0; i < length; ++i) {
+    [hex appendString:[NSString stringWithFormat:@"%02lx", (unsigned long)buffer[i]]];
+  }
+
+  return [NSString stringWithString:hex];
 }
 
 - (NSArray<PKPaymentPass *> *)paymentPasses {
@@ -45,24 +89,6 @@ RCT_EXPORT_MODULE()
   }
 
   return paymentPasses;
-}
-
-// https://stackoverflow.com/a/9084784
-- (NSString*)dataToHex:(nonnull NSData *)data {
-  const unsigned char *buffer = (const unsigned char *)[data bytes];
-
-  if (!buffer) {
-    return [NSString string];
-  }
-
-  NSUInteger length = [data length];
-  NSMutableString *hex = [NSMutableString stringWithCapacity:(length * 2)];
-
-  for (int i = 0; i < length; ++i) {
-    [hex appendString:[NSString stringWithFormat:@"%02lx", (unsigned long)buffer[i]]];
-  }
-
-  return [NSString stringWithString:hex];
 }
 
 RCT_EXPORT_METHOD(getCards:(RCTPromiseResolveBlock)resolve
@@ -120,7 +146,7 @@ RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
   NSString * _Nullable lastFourDigits = [data objectForKey:@"lastFourDigits"];
 
   if (holderName == nil || lastFourDigits == nil) {
-    return reject(@"wallet_error", @"addCard input is not correctly formatted", nil);
+    return reject(@"wallet_error", @"Input is not correctly formatted", nil);
   }
 
   [config setCardholderName:holderName];
@@ -138,7 +164,7 @@ RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
     return reject(@"wallet_error", @"Could not create view controller", nil);
   }
 
-  _resolve = resolve;
+  [self keepPromisePendingWithResolve:resolve reject:reject];
 
   [RCTPresentedViewController() presentViewController:_viewController animated:true completion:nil];
   [_viewController setDelegate:self];
@@ -166,12 +192,8 @@ RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
     @"nonceSignature": [self dataToHex:nonceSignature],
   };
 
-  _completionHandler = handler;
-
-  if (_resolve != nil) {
-    _resolve(data);
-    _resolve = nil;
-  }
+  _onAddPaymentPassRequest = handler;
+  [self resolvePendingPromiseWithData:data];
 }
 
 RCT_EXPORT_METHOD(addCard:(NSDictionary *)data
@@ -195,8 +217,8 @@ RCT_EXPORT_METHOD(addCard:(NSDictionary *)data
   [request setEncryptedPassData:[[NSData alloc] initWithBase64EncodedString:encryptedData options:NSDataBase64DecodingIgnoreUnknownCharacters]];
   [request setEphemeralPublicKey:[[NSData alloc] initWithBase64EncodedString:ephemeralPublicKey options:NSDataBase64DecodingIgnoreUnknownCharacters]];
 
-  _resolve = resolve;
-  _completionHandler(request);
+  [self keepPromisePendingWithResolve:resolve reject:reject];
+  _onAddPaymentPassRequest(request);
 }
 
 - (void)addPaymentPassViewController:(nonnull PKAddPaymentPassViewController *)controller
@@ -205,13 +227,16 @@ RCT_EXPORT_METHOD(addCard:(NSDictionary *)data
   if (_viewController != nil) {
     [RCTPresentedViewController() dismissViewControllerAnimated:true completion:^{
       self->_viewController = nil;
-      self->_completionHandler = nil;
+      self->_onAddPaymentPassRequest = nil;
     }];
   }
 
-  if (_resolve != nil) {
-    _resolve(@(error == nil));
-    _resolve = nil;
+  bool success = error == nil;
+
+  if (success || error.code == PKInvalidDataError) {
+    [self resolvePendingPromiseWithData:@(success)];
+  } else {
+    [self rejectPendingPromiseWithMessage:[error localizedDescription]];
   }
 }
 
