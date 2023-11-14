@@ -61,8 +61,7 @@ export const CardDetailsScreen = ({
           .toPromise(),
       )
       .then(parseOperationResult)
-      .then((data) => data.card?.digitalCards.edges)
-      .then((edges) => edges?.find(({ node }) => node.id === digitalCardId)?.node)
+      .then(({ card }) => card?.digitalCards.edges[0]?.node)
       .then((digitalCard) =>
         digitalCard?.__typename !== "PendingDigitalCard" ||
         isNullish(digitalCard.inAppProvisioningData)
