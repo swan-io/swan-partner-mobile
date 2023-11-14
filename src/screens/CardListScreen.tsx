@@ -265,10 +265,10 @@ export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps
               userId !== user.id
                 ? "error"
                 : canBeAdded
-                ? "add"
-                : isNotNullish(passURLOrToken)
-                ? "show"
-                : "added"
+                  ? "add"
+                  : isNotNullish(passURLOrToken)
+                    ? "show"
+                    : "added"
             }
             designUrl={designUrl}
             holderName={holderName}
