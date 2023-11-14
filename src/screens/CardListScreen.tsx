@@ -133,7 +133,7 @@ const ListItem = ({
 
   const handleShowCard = React.useCallback(() => {
     if (isNotNullish(passURLOrToken)) {
-      Wallet.openCard(passURLOrToken).catch((error: Error) => {
+      Wallet.showCard(passURLOrToken).catch((error: Error) => {
         handleErrorWithAlert(error);
       });
     }
@@ -188,13 +188,9 @@ const ListItem = ({
 };
 
 export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps<"CardList">) => {
-  const [variables, setVariables] = React.useState<CardListQueryVariables>({
-    first: 10,
-    filters: { statuses: ["Enabled", "Processing"] },
-    orderBy: { direction: "Desc", field: "createdAt" },
-  });
-
   const insets = useSafeAreaInsets();
+
+  const [variables, setVariables] = React.useState<CardListQueryVariables>({ first: 10 });
   const { fetching, data } = useBasicQuery({ query: CardListDocument, variables });
 
   const [cardsInWallet, setCardsInWallet] = React.useState<
@@ -249,14 +245,13 @@ export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps
         }
 
         const cardInWallet = cardsInWallet.cards.find(
-          ({ FPANSuffix }) => lastFourDigits === FPANSuffix,
+          (card) => lastFourDigits === card.lastFourDigits,
         );
 
         const canBeAdded = cardInWallet?.canBeAdded ?? true;
         const designUrl = node.cardDesignUrl;
+        const passURLOrToken = cardInWallet?.passURLOrToken;
 
-        const passURLOrToken =
-          Platform.OS === "ios" ? cardInWallet?.passURL : cardInWallet?.identifier;
         const textColor =
           node.cardProduct.cardDesigns[0]?.cardBackground.cardTextColor ?? colors.white;
 
@@ -266,10 +261,10 @@ export const CardListScreen = ({ navigation: { navigate } }: NavigatorRouteProps
               userId !== user.id
                 ? "error"
                 : canBeAdded
-                ? "add"
-                : isNotNullish(passURLOrToken)
-                ? "show"
-                : "added"
+                  ? "add"
+                  : isNotNullish(passURLOrToken)
+                    ? "show"
+                    : "added"
             }
             designUrl={designUrl}
             holderName={holderName}

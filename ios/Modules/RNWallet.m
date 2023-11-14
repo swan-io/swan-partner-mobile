@@ -5,14 +5,14 @@
 
 @interface RNWallet() <PKAddPaymentPassViewControllerDelegate>
 
-@property (nonatomic, strong) PKAddPaymentPassViewController *addPaymentPassViewController;
-@property (nonatomic, strong) void (^completionHandler)(PKAddPaymentPassRequest *request);
+@property (nonatomic, strong) PKAddPaymentPassViewController *viewController;
+@property (nonatomic, strong) void (^onAddPaymentPassRequest)(PKAddPaymentPassRequest *request);
+@property (nonatomic, strong) void (^resolve)(id result);
+@property (nonatomic, strong) void (^reject)(NSString *, NSString *, NSError *);
 
 @end
 
-@implementation RNWallet {
-  bool hasListeners;
-}
+@implementation RNWallet
 
 RCT_EXPORT_MODULE()
 
@@ -24,31 +24,33 @@ RCT_EXPORT_MODULE()
   return dispatch_get_main_queue();
 }
 
-- (void)startObserving {
-  hasListeners = YES;
+- (void)keepPromisePendingWithResolve:(RCTPromiseResolveBlock)resolve
+                               reject:(RCTPromiseRejectBlock)reject {
+  if (_reject != nil) {
+    _reject(@"wallet_error", @"Promise aborted by incoming new operation", nil);
+  }
+  _resolve = resolve;
+  _reject = reject;
 }
 
-- (void)stopObserving {
-  hasListeners = NO;
-}
-
-- (NSArray<NSString *> *)supportedEvents {
-  return @[@"onAddCardEvent"];
-}
-
-- (void)sendEvent:(nonnull NSString *)name
-             data:(nonnull id)data {
-  if (hasListeners) {
-    [self sendEventWithName:@"onAddCardEvent" body:@{ @"name": name, @"data": data }];
+- (void)resolvePendingPromiseWithData:(id)data {
+  if (_resolve != nil) {
+    _resolve(data);
+    _resolve = nil;
+    _reject = nil;
   }
 }
 
-- (void)sendErrorEvent:(nonnull NSString *)message {
-  [self sendEvent:@"error" data:message];
+- (void)rejectPendingPromiseWithMessage:(NSString *)message {
+  if (_reject != nil) {
+    _reject(@"wallet_error", message, nil);
+    _resolve = nil;
+    _reject = nil;
+  }
 }
 
 // https://stackoverflow.com/a/9084784
-- (NSString*)dataToHex:(nonnull NSData *)data {
+- (NSString *)dataToHex:(nonnull NSData *)data {
   const unsigned char *buffer = (const unsigned char *)[data bytes];
 
   if (!buffer) {
@@ -65,12 +67,7 @@ RCT_EXPORT_MODULE()
   return [NSString stringWithString:hex];
 }
 
-RCT_EXPORT_METHOD(getCards:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  if (![PKAddPaymentPassViewController canAddPaymentPass]) {
-    return reject(@"wallet_error", @"Adding payment pass is not allowed", nil);
-  }
-
+- (NSArray<PKPaymentPass *> *)paymentPasses {
   PKPassLibrary *passLibrary = [PKPassLibrary new];
   NSArray<PKPass *> *remotePasses = nil;
 
@@ -81,101 +78,96 @@ RCT_EXPORT_METHOD(getCards:(RCTPromiseResolveBlock)resolve
   }
 
   NSArray<PKPass *> *passes = [[passLibrary passes] arrayByAddingObjectsFromArray:remotePasses];
-  NSMutableArray<NSDictionary *> *cards = [NSMutableArray array];
+  NSMutableArray<PKPaymentPass *> *paymentPasses = [NSMutableArray array];
 
   for (PKPass *pass in passes) {
     PKPaymentPass * _Nullable paymentPass = [pass paymentPass];
 
-    if (paymentPass == nil) {
-      continue;
+    if (paymentPass != nil) {
+      [paymentPasses addObject:paymentPass];
     }
+  }
 
-    NSString * _Nullable identifier = [paymentPass primaryAccountIdentifier];
-    NSString * _Nullable suffix = [paymentPass primaryAccountNumberSuffix];
+  return paymentPasses;
+}
 
-    if (identifier == nil || suffix == nil) {
-      continue;
-    }
+RCT_EXPORT_METHOD(getCards:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  NSMutableArray<NSDictionary *> *cards = [NSMutableArray array];
+  PKPassLibrary *passLibrary = [PKPassLibrary new];
+
+  for (PKPaymentPass *paymentPass in [self paymentPasses]) {
+    NSURL * _Nullable passURL = [paymentPass passURL];
+    bool canBeAdded = [PKAddPaymentPassViewController canAddPaymentPass];
 
     NSMutableDictionary *card = [[NSMutableDictionary alloc] initWithDictionary:@{
-      @"FPANSuffix": suffix,
-      @"identifier": identifier,
+      @"lastFourDigits": [paymentPass primaryAccountNumberSuffix],
     }];
 
-    NSURL * _Nullable passURL = [pass passURL];
-
     if (passURL != nil) {
-      NSString * _Nullable strPassURL = [passURL absoluteString];
+      NSString * _Nullable passURLOrToken = [passURL absoluteString];
 
-      if (strPassURL != nil) {
-        [card setObject:strPassURL forKey:@"passURL"];
+      if (passURLOrToken != nil) {
+        [card setObject:passURLOrToken forKey:@"passURLOrToken"];
       }
     }
 
-    if (@available(iOS 13.4, *)) {
-      [card setObject:@([passLibrary canAddSecureElementPassWithPrimaryAccountIdentifier:identifier]) forKey:@"canBeAdded"];
-    } else {
-      [card setObject:@([passLibrary canAddPaymentPassWithPrimaryAccountIdentifier:identifier]) forKey:@"canBeAdded"];
+    if (canBeAdded) {
+      NSString *identifier = [paymentPass primaryAccountIdentifier];
+
+      if (@available(iOS 13.4, *)) {
+        canBeAdded = [passLibrary canAddSecureElementPassWithPrimaryAccountIdentifier:identifier];
+      } else {
+        canBeAdded = [passLibrary canAddPaymentPassWithPrimaryAccountIdentifier:identifier];
+      }
     }
 
+    [card setObject:@(canBeAdded) forKey:@"canBeAdded"];
     [cards addObject:card];
   }
 
   resolve(cards);
 }
 
-RCT_EXPORT_METHOD(openCard:(NSString *)passURL
+RCT_EXPORT_METHOD(getSignatureData:(NSDictionary *)data
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
-  NSURL * _Nullable url = [[NSURL alloc] initWithString:passURL];
-
-  if (url == nil) {
-    return reject(@"wallet_error", @"Invalid pass URL", nil);
-  }
-
-  [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
-    if (success) {
-      resolve(nil);
-    } else {
-      reject(@"wallet_error", @"Could not open pass", nil);
-    }
-  }];
-}
-
-RCT_EXPORT_METHOD(addCard:(NSDictionary *)data) {
   if (![PKAddPaymentPassViewController canAddPaymentPass]) {
-    return [self sendErrorEvent:@"Adding payment pass is not allowed"];
+    return reject(@"wallet_error", @"Adding payment pass is not allowed", nil);
   }
 
   PKAddPaymentPassRequestConfiguration * _Nullable config = [[PKAddPaymentPassRequestConfiguration alloc] initWithEncryptionScheme:PKEncryptionSchemeECC_V2];
 
   if (config == nil) {
-    return [self sendErrorEvent:@"Could not create configuration"];
+    return reject(@"wallet_error", @"Could not create configuration", nil);
   }
 
-  NSString * _Nullable cardHolderName = [data objectForKey:@"cardHolderName"];
-  NSString * _Nullable identifier = [data objectForKey:@"identifier"];
-  NSString * _Nullable cardSuffix = [data objectForKey:@"cardSuffix"];
+  NSString * _Nullable holderName = [data objectForKey:@"holderName"];
+  NSString * _Nullable lastFourDigits = [data objectForKey:@"lastFourDigits"];
 
-  if (cardHolderName == nil || cardSuffix == nil) {
-    return [self sendErrorEvent:@"addCard input is not correctly formatted"];
+  if (holderName == nil || lastFourDigits == nil) {
+    return reject(@"wallet_error", @"Input is not correctly formatted", nil);
   }
 
-  [config setCardholderName:cardHolderName];
-  [config setPrimaryAccountSuffix:cardSuffix];
+  [config setCardholderName:holderName];
+  [config setPrimaryAccountSuffix:lastFourDigits];
 
-  if (identifier != nil) {
-    [config setPrimaryAccountIdentifier:identifier];
+  for (PKPaymentPass *paymentPass in [self paymentPasses]) {
+    if ([lastFourDigits isEqualToString:[paymentPass primaryAccountNumberSuffix]]) {
+      [config setPrimaryAccountIdentifier:[paymentPass primaryAccountIdentifier]];
+    }
   }
 
-  _addPaymentPassViewController = [[PKAddPaymentPassViewController alloc] initWithRequestConfiguration:config delegate:self];
+  _viewController = [[PKAddPaymentPassViewController alloc] initWithRequestConfiguration:config delegate:self];
 
-  if (_addPaymentPassViewController == nil) {
-    return [self sendErrorEvent:@"Could not create payment view"];
+  if (_viewController == nil) {
+    return reject(@"wallet_error", @"Could not create view controller", nil);
   }
 
-  [RCTPresentedViewController() presentViewController:_addPaymentPassViewController animated:true completion:nil];
-  _addPaymentPassViewController.delegate = self;
+  [self keepPromisePendingWithResolve:resolve reject:reject];
+
+  [RCTPresentedViewController() presentViewController:_viewController animated:true completion:nil];
+  [_viewController setDelegate:self];
 }
 
 - (void)addPaymentPassViewController:(nonnull PKAddPaymentPassViewController *)controller
@@ -200,13 +192,15 @@ RCT_EXPORT_METHOD(addCard:(NSDictionary *)data) {
     @"nonceSignature": [self dataToHex:nonceSignature],
   };
 
-  _completionHandler = handler;
-  [self sendEvent:@"signatureData" data:data];
+  _onAddPaymentPassRequest = handler;
+  [self resolvePendingPromiseWithData:data];
 }
 
-RCT_EXPORT_METHOD(setInAppProvisioningData:(NSDictionary *)data) {
+RCT_EXPORT_METHOD(addCard:(NSDictionary *)data
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
   if (![PKAddPaymentPassViewController canAddPaymentPass]) {
-    return [self sendErrorEvent:@"Adding payment pass is not allowed"];
+    return reject(@"wallet_error", @"Adding payment pass is not allowed", nil);
   }
 
   NSString * _Nullable activationData = [data objectForKey:@"activationData"];
@@ -214,7 +208,7 @@ RCT_EXPORT_METHOD(setInAppProvisioningData:(NSDictionary *)data) {
   NSString * _Nullable ephemeralPublicKey = [data objectForKey:@"ephemeralPublicKey"];
 
   if (activationData == nil || encryptedData == nil || ephemeralPublicKey == nil) {
-    return [self sendErrorEvent:@"setInAppProvisioningData input is not correctly formatted"];
+    return reject(@"wallet_error", @"addCard input is not correctly formatted", nil);
   }
 
   PKAddPaymentPassRequest *request = [PKAddPaymentPassRequest new];
@@ -223,26 +217,47 @@ RCT_EXPORT_METHOD(setInAppProvisioningData:(NSDictionary *)data) {
   [request setEncryptedPassData:[[NSData alloc] initWithBase64EncodedString:encryptedData options:NSDataBase64DecodingIgnoreUnknownCharacters]];
   [request setEphemeralPublicKey:[[NSData alloc] initWithBase64EncodedString:ephemeralPublicKey options:NSDataBase64DecodingIgnoreUnknownCharacters]];
 
-  _completionHandler(request);
+  [self keepPromisePendingWithResolve:resolve reject:reject];
+  _onAddPaymentPassRequest(request);
 }
 
 - (void)addPaymentPassViewController:(nonnull PKAddPaymentPassViewController *)controller
           didFinishAddingPaymentPass:(nullable PKPaymentPass *)pass
                                error:(nullable NSError *)error {
-  if (_addPaymentPassViewController != nil) {
+  if (_viewController != nil) {
     [RCTPresentedViewController() dismissViewControllerAnimated:true completion:^{
-      self->_addPaymentPassViewController = nil;
-      self->_completionHandler = nil;
+      self->_viewController = nil;
+      self->_onAddPaymentPassRequest = nil;
     }];
   }
 
   bool success = error == nil;
 
   if (success || error.code == PKInvalidDataError) {
-    [self sendEvent:@"finished" data:@(success)];
+    [self resolvePendingPromiseWithData:@(success)];
   } else {
-    [self sendErrorEvent:[error localizedDescription]];
+    [self rejectPendingPromiseWithMessage:[error localizedDescription]];
   }
+}
+
+RCT_EXPORT_METHOD(showCard:(NSString *)passURL
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+  NSURL * _Nullable url = [[NSURL alloc] initWithString:passURL];
+
+  if (url == nil) {
+    return reject(@"wallet_error", @"Invalid pass URL", nil);
+  }
+
+  [[UIApplication sharedApplication] openURL:url
+                                     options:@{}
+                           completionHandler:^(BOOL success) {
+    if (success) {
+      resolve(nil);
+    } else {
+      reject(@"wallet_error", @"Could not open pass", nil);
+    }
+  }];
 }
 
 @end

@@ -2,7 +2,6 @@ apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 
 apply from: "./dotenv.gradle"
-apply from: "../../node_modules/@sentry/react-native/sentry.gradle"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -81,8 +80,8 @@ android {
         applicationId "io.swan.id"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1694438152
-        versionName "1.2.0"
+        versionCode 1699970354
+        versionName "1.2.1"
     }
     signingConfigs {
         debug {

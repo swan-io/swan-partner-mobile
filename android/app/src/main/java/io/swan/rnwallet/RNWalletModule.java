@@ -3,6 +3,7 @@ package io.swan.rnwallet;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.util.Base64;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,9 +26,10 @@ import com.google.android.gms.tapandpay.issuer.ViewTokenRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.HashMap;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
-import java.util.Map;
 
 @ReactModule(name = RNWalletModule.NAME)
 public class RNWalletModule extends ReactContextBaseJavaModule implements ActivityEventListener {
@@ -55,6 +57,42 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
   @Override
   public void onNewIntent(Intent intent) {}
 
+  private void keepPromisePending(final Promise promise) {
+    if (mPromise != null) {
+      mPromise.reject("wallet_error", "Promise aborted by incoming new operation");
+    }
+    mPromise = promise;
+  }
+
+  private void resolvePendingPromise(final Object data) {
+    if (mPromise != null) {
+      mPromise.resolve(data);
+      mPromise = null;
+    }
+  }
+
+  private void rejectPendingPromise(final String message) {
+    if (mPromise != null) {
+      mPromise.reject("wallet_error", message);
+      mPromise = null;
+    }
+  }
+
+  private Object base64ToJsonHex(@Nullable String base64) {
+    if (base64 == null) {
+      return JSONObject.NULL;
+    }
+
+    byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
+    StringBuilder hex = new StringBuilder();
+
+    for (byte aByte : bytes) {
+      hex.append(String.format("%02x", aByte));
+    }
+
+    return hex.toString();
+  }
+
   @ReactMethod
   public void getCards(final Promise promise) {
     tapAndPayClient
@@ -69,8 +107,8 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
             for (TokenInfo token : task.getResult()) {
               final WritableMap card = Arguments.createMap();
 
-              card.putString("FPANSuffix", token.getFpanLastFour());
-              card.putString("identifier", token.getIssuerTokenId());
+              card.putString("lastFourDigits", token.getFpanLastFour());
+              card.putString("passURLOrToken", token.getIssuerTokenId());
               card.putBoolean("canBeAdded", false); // card already in wallet
 
               cards.pushMap(card);
@@ -80,7 +118,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
           } else {
             @Nullable Exception exception = task.getException();
 
-            promise.reject("GET_CARDS_ERROR",
+            promise.reject("wallet_error",
               exception != null ? exception.getMessage() : "Unknown error");
           }
         }
@@ -88,7 +126,85 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
   }
 
   @ReactMethod
-  public void openCard(final String token, final Promise promise) {
+  public void getSignatureData(final ReadableMap data, final Promise promise) {
+    promise.resolve(null); // Not needed on Android, only for API parity
+  }
+
+  @ReactMethod
+  public void addCard(final ReadableMap data, final Promise promise) {
+    @Nullable String holderName = data.getString("holderName");
+    @Nullable String lastFourDigits = data.getString("lastFourDigits");
+
+    if (holderName == null || lastFourDigits == null) {
+      promise.reject("wallet_error", "Input is not correctly formatted");
+      return;
+    }
+
+    @Nullable Activity activity = getCurrentActivity();
+
+    if (activity == null) {
+      promise.reject("wallet_error", "Could not get current activity");
+      return;
+    }
+
+    @Nullable String activationData = data.getString("activationData");
+    @Nullable String encryptedData = data.getString("encryptedData");
+    @Nullable String ephemeralPublicKey = data.getString("ephemeralPublicKey");
+    @Nullable String iv = data.getString("iv");
+    @Nullable String oaepHashingAlgorithm = data.getString("oaepHashingAlgorithm");
+    @Nullable String publicKeyFingerprint = data.getString("publicKeyFingerprint");
+
+    JSONObject opcJson = new JSONObject();
+
+    try {
+      JSONObject info = new JSONObject();
+
+      info.put("encryptedData", base64ToJsonHex(encryptedData));
+      info.put("iv", base64ToJsonHex(iv));
+      info.put("publicKeyFingerprint", base64ToJsonHex(publicKeyFingerprint));
+      info.put("encryptedKey", base64ToJsonHex(ephemeralPublicKey));
+      info.put("oaepHashingAlgorithm",
+        oaepHashingAlgorithm != null && oaepHashingAlgorithm.contains("SHA256") ? "SHA256" : "SHA512");
+
+      opcJson.put("cardInfo", info);
+
+      if (activationData != null) {
+        opcJson.put("tokenizationAuthenticationValue", activationData);
+      }
+    } catch (JSONException exception) {
+      promise.reject("wallet_error", exception.getMessage());
+      return;
+    }
+
+    byte[] opc = Base64.encode(opcJson.toString().getBytes(), Base64.DEFAULT);
+
+    PushTokenizeRequest request = new PushTokenizeRequest.Builder()
+      .setOpaquePaymentCard(opc)
+      .setNetwork(TapAndPay.CARD_NETWORK_MASTERCARD)
+      .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)
+      .setDisplayName("Swan card")
+      .setLastDigits(lastFourDigits)
+      .build();
+
+    keepPromisePending(promise);
+    tapAndPayClient.pushTokenize(activity, request, REQUEST_CODE_PUSH_TOKENIZE);
+  }
+
+  @Override
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, @Nullable Intent intent) {
+    if (requestCode == REQUEST_CODE_PUSH_TOKENIZE) {
+      boolean success = resultCode == Activity.RESULT_OK;
+
+      if (success || resultCode == Activity.RESULT_CANCELED) {
+        resolvePendingPromise(success);
+      } else {
+        rejectPendingPromise("Could not provision card");
+      }
+    }
+  }
+
+  @ReactMethod
+  public void showCard(final String token, final Promise promise) {
     ViewTokenRequest request = new ViewTokenRequest.Builder()
       .setIssuerTokenId(token)
       .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)
@@ -105,66 +221,15 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
               task.getResult().send();
               promise.resolve(null);
             } catch (PendingIntent.CanceledException exception) {
-              promise.reject("OPEN_CARD_IN_WALLET_ERROR", exception.getMessage());
+              promise.reject("wallet_error", exception.getMessage());
             }
           } else {
             @Nullable Exception exception = task.getException();
 
-            promise.reject("OPEN_CARD_IN_WALLET_ERROR",
+            promise.reject("wallet_error",
               exception != null ? exception.getMessage() : "Unknown error");
           }
         }
       });
-  }
-
-  @ReactMethod
-  public void addCard(final ReadableMap data, final Promise promise) {
-    @Nullable String cardHolderName = data.getString("cardHolderName");
-    @Nullable String cardSuffix = data.getString("cardSuffix");
-    @Nullable String opc = data.getString("opc");
-
-    if (cardHolderName == null || cardSuffix == null || opc == null) {
-      promise.reject("ADD_CARD_ERROR", "Input is not correctly formatted");
-      return;
-    }
-
-    @Nullable Activity activity = getCurrentActivity();
-
-    if (activity == null) {
-      promise.reject("ADD_CARD_ERROR", "Could not get current activity");
-      return;
-    }
-
-    PushTokenizeRequest request = new PushTokenizeRequest.Builder()
-      .setOpaquePaymentCard(opc.getBytes())
-      .setNetwork(TapAndPay.CARD_NETWORK_MASTERCARD)
-      .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)
-      .setDisplayName("Swan card")
-      .setLastDigits(cardSuffix)
-      .build();
-
-    mPromise = promise;
-    tapAndPayClient.pushTokenize(activity, request, REQUEST_CODE_PUSH_TOKENIZE);
-  }
-
-  @Override
-  public void onActivityResult(Activity activity, int requestCode, int resultCode, @Nullable Intent intent) {
-    if (requestCode != REQUEST_CODE_PUSH_TOKENIZE || mPromise == null) {
-      return;
-    }
-
-    switch (resultCode) {
-      case Activity.RESULT_OK:
-        mPromise.resolve(true);
-        break;
-      case Activity.RESULT_CANCELED:
-        mPromise.resolve(false);
-        break;
-      default:
-        mPromise.reject("ADD_CARD_ERROR", "Could not provision card");
-    }
-
-    // Remove promise so it cannot be reused
-    mPromise = null;
   }
 }

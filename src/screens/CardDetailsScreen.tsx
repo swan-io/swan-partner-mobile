@@ -54,44 +54,21 @@ export const CardDetailsScreen = ({
   const insets = useSafeAreaInsets();
 
   const onWalletButtonPress = React.useCallback(() => {
-    Wallet.getCards()
-      .then((walletCards) => walletCards.find((card) => card.FPANSuffix === lastFourDigits))
-      .then((maybeWalletCard) =>
-        Wallet.addCard({
-          cardHolderName: holderName,
-          cardSuffix: lastFourDigits,
-          identifier: maybeWalletCard?.identifier,
-
-          fetchInAppProvisioningData: (signatureData) => {
-            return getClient()
-              .query(GetDigitalCardsEncryptedInfoDocument, {
-                cardId,
-                signatureData,
-                filters: {
-                  id: digitalCardId,
-                },
-              })
-              .toPromise()
-              .then(parseOperationResult)
-              .then(({ card }) => {
-                const digitalCard = (card?.digitalCards.edges ?? []).find(
-                  ({ node }) => node.id === digitalCardId,
-                );
-
-                const node = digitalCard?.node;
-
-                if (
-                  node?.__typename !== "PendingDigitalCard" ||
-                  isNullish(node.inAppProvisioningData)
-                ) {
-                  throw new Error("Could not find activation data");
-                }
-
-                return node.inAppProvisioningData;
-              });
-          },
-        }),
+    Wallet.getSignatureData({ holderName, lastFourDigits })
+      .then((signatureData) =>
+        getClient()
+          .query(GetDigitalCardsEncryptedInfoDocument, { cardId, digitalCardId, signatureData })
+          .toPromise(),
       )
+      .then(parseOperationResult)
+      .then(({ card }) => card?.digitalCards.edges[0]?.node)
+      .then((digitalCard) =>
+        digitalCard?.__typename !== "PendingDigitalCard" ||
+        isNullish(digitalCard.inAppProvisioningData)
+          ? Promise.reject(new Error("Could not get in-app provisioning data"))
+          : digitalCard.inAppProvisioningData,
+      )
+      .then((inAppProvisioningData) => Wallet.addCard(inAppProvisioningData))
       .then((success) => {
         if (success) {
           goBack();
