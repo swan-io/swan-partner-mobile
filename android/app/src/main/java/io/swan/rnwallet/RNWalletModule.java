@@ -78,7 +78,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
     }
   }
 
-  private Object base64ToHex(@NonNull String base64) {
+  private String base64ToHex(@NonNull String base64) {
     byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
     StringBuilder builder = new StringBuilder();
 
@@ -165,7 +165,6 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
 
     try {
       cardInfo.put("encryptedData", base64ToHex(encryptedData));
-      cardInfo.put("encryptedKey", base64ToHex(ephemeralPublicKey));
 
       if (iv != null) {
         cardInfo.put("iv", base64ToHex(iv));
@@ -174,6 +173,7 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
         cardInfo.put("publicKeyFingerprint", base64ToHex(publicKeyFingerprint));
       }
 
+      cardInfo.put("encryptedKey", base64ToHex(ephemeralPublicKey));
       cardInfo.put("oaepHashingAlgorithm",
         oaepHashingAlgorithm != null && oaepHashingAlgorithm.contains("SHA256") ? "SHA256" : "SHA512");
 
@@ -184,10 +184,11 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
       return;
     }
 
-    byte[] opc = Base64.encode(opcJson.toString().getBytes(), Base64.DEFAULT);
+    String opc = Base64.encodeToString(opcJson.toString().getBytes(), Base64.DEFAULT)
+      .replace("\n", "");
 
     PushTokenizeRequest request = new PushTokenizeRequest.Builder()
-      .setOpaquePaymentCard(opc)
+      .setOpaquePaymentCard(opc.getBytes())
       .setNetwork(TapAndPay.CARD_NETWORK_MASTERCARD)
       .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_MASTERCARD)
       .setDisplayName("Swan card")
