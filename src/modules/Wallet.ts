@@ -23,6 +23,7 @@ type GetSignatureDataInput = {
 };
 
 type AddCardInput = {
+  lastFourDigits: string;
   activationData: string;
   encryptedData: string;
   ephemeralPublicKey: string;

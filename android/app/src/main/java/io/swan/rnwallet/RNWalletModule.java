@@ -78,19 +78,21 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
     }
   }
 
-  private Object base64ToJsonHex(@Nullable String base64) {
-    if (base64 == null) {
-      return JSONObject.NULL;
-    }
-
+  private Object base64ToHex(@NonNull String base64) {
     byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
-    StringBuilder hex = new StringBuilder();
+    StringBuilder builder = new StringBuilder();
 
-    for (byte aByte : bytes) {
-      hex.append(String.format("%02x", aByte));
+    for (byte b : bytes) {
+      String hex = Integer.toHexString(b & 0xff);
+
+      if (hex.length() % 2 == 1) {
+        hex = "0" + hex;
+      }
+
+      builder.append(hex);
     }
 
-    return hex.toString();
+    return builder.toString();
   }
 
   @ReactMethod
@@ -132,10 +134,21 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
 
   @ReactMethod
   public void addCard(final ReadableMap data, final Promise promise) {
-    @Nullable String holderName = data.getString("holderName");
     @Nullable String lastFourDigits = data.getString("lastFourDigits");
 
-    if (holderName == null || lastFourDigits == null) {
+    @Nullable String activationData = data.getString("activationData");
+    @Nullable String encryptedData = data.getString("encryptedData");
+    @Nullable String ephemeralPublicKey = data.getString("ephemeralPublicKey");
+
+    @Nullable String iv = data.getString("iv");
+    @Nullable String oaepHashingAlgorithm = data.getString("oaepHashingAlgorithm");
+    @Nullable String publicKeyFingerprint = data.getString("publicKeyFingerprint");
+
+    if (lastFourDigits == null
+      || activationData == null
+      || encryptedData == null
+      || ephemeralPublicKey == null
+    ) {
       promise.reject("wallet_error", "Input is not correctly formatted");
       return;
     }
@@ -147,30 +160,25 @@ public class RNWalletModule extends ReactContextBaseJavaModule implements Activi
       return;
     }
 
-    @Nullable String activationData = data.getString("activationData");
-    @Nullable String encryptedData = data.getString("encryptedData");
-    @Nullable String ephemeralPublicKey = data.getString("ephemeralPublicKey");
-    @Nullable String iv = data.getString("iv");
-    @Nullable String oaepHashingAlgorithm = data.getString("oaepHashingAlgorithm");
-    @Nullable String publicKeyFingerprint = data.getString("publicKeyFingerprint");
-
     JSONObject opcJson = new JSONObject();
+    JSONObject cardInfo = new JSONObject();
 
     try {
-      JSONObject info = new JSONObject();
+      cardInfo.put("encryptedData", base64ToHex(encryptedData));
+      cardInfo.put("encryptedKey", base64ToHex(ephemeralPublicKey));
 
-      info.put("encryptedData", base64ToJsonHex(encryptedData));
-      info.put("iv", base64ToJsonHex(iv));
-      info.put("publicKeyFingerprint", base64ToJsonHex(publicKeyFingerprint));
-      info.put("encryptedKey", base64ToJsonHex(ephemeralPublicKey));
-      info.put("oaepHashingAlgorithm",
+      if (iv != null) {
+        cardInfo.put("iv", base64ToHex(iv));
+      }
+      if (publicKeyFingerprint != null) {
+        cardInfo.put("publicKeyFingerprint", base64ToHex(publicKeyFingerprint));
+      }
+
+      cardInfo.put("oaepHashingAlgorithm",
         oaepHashingAlgorithm != null && oaepHashingAlgorithm.contains("SHA256") ? "SHA256" : "SHA512");
 
-      opcJson.put("cardInfo", info);
-
-      if (activationData != null) {
-        opcJson.put("tokenizationAuthenticationValue", activationData);
-      }
+      opcJson.put("cardInfo", cardInfo);
+      opcJson.put("tokenizationAuthenticationValue", activationData);
     } catch (JSONException exception) {
       promise.reject("wallet_error", exception.getMessage());
       return;
