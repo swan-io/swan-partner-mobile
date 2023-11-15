@@ -68,7 +68,7 @@ export const CardDetailsScreen = ({
           ? Promise.reject(new Error("Could not get in-app provisioning data"))
           : digitalCard.inAppProvisioningData,
       )
-      .then((inAppProvisioningData) => Wallet.addCard(inAppProvisioningData))
+      .then((inAppProvisioningData) => Wallet.addCard({ lastFourDigits, ...inAppProvisioningData }))
       .then((success) => {
         if (success) {
           goBack();
