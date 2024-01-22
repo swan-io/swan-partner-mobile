@@ -1,0 +1,20 @@
+{
+  "authenticationScreen.signInButton": "Kirjaudu sisään",
+  "cardDetailsScreen.descriptionEnd": "ottaaksesi sen käyttöön välittömästi.",
+  "cardDetailsScreen.descriptionStart": "Lisää korttisi kohteeseen",
+  "cardDetailsScreen.laterButton": "Myöhemmin",
+  "cardListScreen.addCardButton": "Lisää palveluun {serviceName}",
+  "cardListScreen.alreadyAdded": "Lisätty jo palveluun {serviceName}",
+  "cardListScreen.cannotBeAdded": "Ei voi lisätä",
+  "cardListScreen.description": "Tässä Swan-korttisi. Lisää ne palveluun {serviceName} käyttääksesi niitä suoraan laitteeltasi.",
+  "cardListScreen.noCardMessage": "Yhtään korttia ei löydy",
+  "cardListScreen.noWalletUsageMessage": "Ei pääsyä lompakkoon",
+  "cardListScreen.showCardButton": "Näytä palvelussa {serviceName}",
+  "cardListScreen.title": "Kortit",
+  "error.generic": "Virhe tapahtui",
+  "errorView.text": "Jotain meni pieleen",
+  "logoutButton.text": "Kirjaudu ulos",
+  "projectListScreen.description": "Tässä käyttämäsi korttibrändit:",
+  "projectListScreen.noProjectMessage": "Yhtään projektia ei löydy",
+  "projectListScreen.title": "Brändit"
+}
