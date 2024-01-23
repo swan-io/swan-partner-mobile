@@ -12,10 +12,16 @@
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
+
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+  return [self getBundleURL];
+}
+
+- (NSURL *)getBundleURL
 {
 #if DEBUG
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
@@ -36,11 +42,9 @@
   return [RCTLinkingManager application:application openURL:url options:options];
 }
 
-- (BOOL)application:(UIApplication *)application
-  continueUserActivity:(nonnull NSUserActivity *)userActivity
-  restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
+- (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)activity restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))handler
 {
-  return [RCTLinkingManager application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+  return [RCTLinkingManager application:application continueUserActivity:activity restorationHandler:handler];
 }
 
 @end
