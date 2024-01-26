@@ -1,18 +1,20 @@
+import { openBrowser } from "@swan-io/react-native-browser";
 import * as React from "react";
 import { Animated, ImageRequireSource, Platform, StyleSheet, View } from "react-native";
-import { NavigationBar, StatusBar } from "react-native-bars";
+import { NavigationBar, StatusBar, StatusBarProps } from "react-native-bars";
 import BootSplash, { Manifest } from "react-native-bootsplash";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { P, isMatching } from "ts-pattern";
+import parseUrl from "url-parse";
 import { Button } from "../components/Button";
 import { colors } from "../constants/colors";
 import { useAnimatedValue } from "../hooks/useAnimatedValue";
-import { InAppBrowser } from "../modules/InAppBrowser";
 import { Storage } from "../modules/Storage";
 import { handleErrorWithAlert } from "../states/alerts";
 import { setAuthenticated } from "../states/authenticated";
 import { env } from "../utils/env";
 import { t } from "../utils/i18n";
+import { isNotNullish } from "../utils/nullish";
 
 const LOGO = require("../assets/bootsplash_logo.png") as ImageRequireSource;
 const MANIFEST = require("../assets/bootsplash_manifest.json") as Manifest;
@@ -67,18 +69,40 @@ export const AuthenticationScreen = () => {
   });
 
   const handleOnSignInPress = React.useCallback(() => {
-    void InAppBrowser.open(`${env.API_HOST}/auth`, {
-      dismissButtonStyle: "close",
-      onCallback: (params) => {
-        if (!hasSessionToken(params)) {
-          return InAppBrowser.close();
+    let entry: StatusBarProps | undefined;
+
+    void openBrowser(`${env.API_HOST}/auth`, {
+      dismissButtonStyle: "cancel",
+      controlTintColor: colors.swan[900],
+      barTintColor: colors.swan[50],
+
+      onOpen: () => {
+        entry = StatusBar.pushStackEntry({
+          animated: true,
+          barStyle:
+            Platform.OS === "ios" && Number.parseInt(Platform.Version, 10) >= 13
+              ? "light-content"
+              : "dark-content",
+        });
+      },
+
+      onClose: (url) => {
+        if (isNotNullish(entry)) {
+          StatusBar.popStackEntry(entry);
         }
 
-        Storage.setItem("sessionToken", params.sessionToken)
-          .then(() => setAuthenticated(true))
-          .catch((error: Error) => {
-            handleErrorWithAlert(error);
-          });
+        if (isNotNullish(url)) {
+          const { protocol, host, query } = parseUrl(url, true);
+          const origin = `${protocol}//${host}`;
+
+          if (origin === env.DEEPLINK_CALLBACK_URL && hasSessionToken(query)) {
+            Storage.setItem("sessionToken", query.sessionToken)
+              .then(() => setAuthenticated(true))
+              .catch((error: Error) => {
+                handleErrorWithAlert(error);
+              });
+          }
+        }
       },
     });
   }, []);
