@@ -12,7 +12,6 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		88D01A0F97A8D0176CF8A35C /* libPods-Swan.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41D60948FB0A749A7AAD7BC5 /* libPods-Swan.a */; };
 		DD31EEC0287DCBA200F64485 /* RNKeyboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DD31EEB9287DCBA200F64485 /* RNKeyboardManager.m */; };
-		DD31EEC1287DCBA200F64485 /* RNInAppBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = DD31EEBA287DCBA200F64485 /* RNInAppBrowser.m */; };
 		DD31EECC287DCCDC00F64485 /* inter_bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = DD31EEC8287DCC6900F64485 /* inter_bold.otf */; };
 		DD31EECD287DCCDE00F64485 /* inter_medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = DD31EEC6287DCC6900F64485 /* inter_medium.otf */; };
 		DD31EECE287DCCE100F64485 /* inter_semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = DD31EEC9287DCC6900F64485 /* inter_semibold.otf */; };
@@ -33,10 +32,8 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Swan/main.m; sourceTree = "<group>"; };
 		41D60948FB0A749A7AAD7BC5 /* libPods-Swan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Swan.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		442D5904F1A914C3E3B03DD7 /* Pods-Swan.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Swan.release.xcconfig"; path = "Target Support Files/Pods-Swan/Pods-Swan.release.xcconfig"; sourceTree = "<group>"; };
-		DD31EEB4287DCBA200F64485 /* RNInAppBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNInAppBrowser.h; path = Modules/RNInAppBrowser.h; sourceTree = "<group>"; };
 		DD31EEB6287DCBA200F64485 /* RNKeyboardManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNKeyboardManager.h; path = Modules/RNKeyboardManager.h; sourceTree = "<group>"; };
 		DD31EEB9287DCBA200F64485 /* RNKeyboardManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNKeyboardManager.m; path = Modules/RNKeyboardManager.m; sourceTree = "<group>"; };
-		DD31EEBA287DCBA200F64485 /* RNInAppBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNInAppBrowser.m; path = Modules/RNInAppBrowser.m; sourceTree = "<group>"; };
 		DD31EEC6287DCC6900F64485 /* inter_medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = inter_medium.otf; path = ../android/app/src/main/res/font/inter_medium.otf; sourceTree = "<group>"; };
 		DD31EEC7287DCC6900F64485 /* inter_regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = inter_regular.otf; path = ../android/app/src/main/res/font/inter_regular.otf; sourceTree = "<group>"; };
 		DD31EEC8287DCC6900F64485 /* inter_bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = inter_bold.otf; path = ../android/app/src/main/res/font/inter_bold.otf; sourceTree = "<group>"; };
@@ -123,8 +120,6 @@
 		DD31EEB2287DCB8C00F64485 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				DD31EEB4287DCBA200F64485 /* RNInAppBrowser.h */,
-				DD31EEBA287DCBA200F64485 /* RNInAppBrowser.m */,
 				DD31EEB6287DCBA200F64485 /* RNKeyboardManager.h */,
 				DD31EEB9287DCBA200F64485 /* RNKeyboardManager.m */,
 				DD64393E28BF6F62002C1262 /* RNWallet.h */,
@@ -303,7 +298,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DD31EEC1287DCBA200F64485 /* RNInAppBrowser.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				DD64393728BF5CA3002C1262 /* RNApplePayButtonView.m in Sources */,

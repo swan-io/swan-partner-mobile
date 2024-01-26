@@ -1,4 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
+import { openBrowser } from "@swan-io/react-native-browser";
 import * as React from "react";
 import {
   ActivityIndicator,
@@ -11,8 +12,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { StatusBar, StatusBarProps } from "react-native-bars";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { P, match } from "ts-pattern";
+import parseUrl from "url-parse";
 import { useMutation } from "urql";
 import { NavigatorRouteProps } from "../Navigator";
 import { Box } from "../components/Box";
@@ -26,7 +29,6 @@ import { Space } from "../components/Space";
 import { Text } from "../components/Text";
 import { colors } from "../constants/colors";
 import { AddDigitalCardDocument, CardListDocument, CardListQueryVariables } from "../graphql";
-import { InAppBrowser } from "../modules/InAppBrowser";
 import { Card, Wallet } from "../modules/Wallet";
 import { handleErrorWithAlert } from "../states/alerts";
 import { env } from "../utils/env";
@@ -110,11 +112,40 @@ const ListItem = ({
             const { statusInfo } = digitalCard;
 
             if (statusInfo.__typename === "DigitalCardConsentPendingStatusInfo") {
-              void InAppBrowser.open(statusInfo.consent.consentUrl, {
+              let entry: StatusBarProps | undefined;
+
+              void openBrowser(statusInfo.consent.consentUrl, {
                 dismissButtonStyle: "cancel",
-                onCallback: ({ resourceId, env, status }) => {
-                  if (isNotNullishOrEmpty(resourceId) && env === "Live" && status === "Accepted") {
-                    onCallback(digitalCard.id);
+                controlTintColor: colors.swan[900],
+                barTintColor: colors.swan[50],
+
+                onOpen: () => {
+                  entry = StatusBar.pushStackEntry({
+                    animated: true,
+                    barStyle:
+                      Platform.OS === "ios" && Number.parseInt(Platform.Version, 10) >= 13
+                        ? "light-content"
+                        : "dark-content",
+                  });
+                },
+
+                onClose: (url) => {
+                  if (isNotNullish(entry)) {
+                    StatusBar.popStackEntry(entry);
+                  }
+
+                  if (isNotNullish(url)) {
+                    const { protocol, host, query } = parseUrl(url, true);
+                    const origin = `${protocol}//${host}`;
+
+                    if (
+                      origin === env.DEEPLINK_CALLBACK_URL &&
+                      isNotNullishOrEmpty(query.resourceId) &&
+                      query.env === "Live" &&
+                      query.status === "Accepted"
+                    ) {
+                      onCallback(digitalCard.id);
+                    }
                   }
                 },
               });
