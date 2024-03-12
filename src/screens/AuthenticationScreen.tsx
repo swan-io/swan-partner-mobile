@@ -11,7 +11,7 @@ import { colors } from "../constants/colors";
 import { useAnimatedValue } from "../hooks/useAnimatedValue";
 import { Storage } from "../modules/Storage";
 import { handleErrorWithAlert } from "../states/alerts";
-import { setAuthenticated } from "../states/authenticated";
+import { setAuthentication } from "../states/authentication";
 import { env } from "../utils/env";
 import { t } from "../utils/i18n";
 import { isNotNullish } from "../utils/nullish";
@@ -97,7 +97,7 @@ export const AuthenticationScreen = () => {
 
           if (origin === env.DEEPLINK_CALLBACK_URL && hasSessionToken(query)) {
             Storage.setItem("sessionToken", query.sessionToken)
-              .then(() => setAuthenticated(true))
+              .then(() => setAuthentication("user"))
               .catch((error: Error) => {
                 handleErrorWithAlert(error);
               });

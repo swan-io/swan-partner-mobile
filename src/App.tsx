@@ -1,18 +1,18 @@
 import * as React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
+import { Navigator } from "./Navigator";
 import { AlertStack } from "./components/AlertStack";
 import { ErrorView } from "./components/ErrorView";
 import { Storage } from "./modules/Storage";
-import { Navigator } from "./Navigator";
 import { AuthenticationScreen } from "./screens/AuthenticationScreen";
-import { setAuthenticated, useAuthenticated } from "./states/authenticated";
+import { setAuthentication, useAuthentication } from "./states/authentication";
 import { setResetErrorBoundary } from "./states/resetErrorBoundary";
 import { ClientProvider } from "./utils/urql";
 
 export const App = () => {
-  const authenticated = useAuthenticated();
+  const authenticated = useAuthentication();
   const errorBoundaryRef = React.useRef<ErrorBoundary>(null);
 
   React.useEffect(() => {
@@ -21,8 +21,8 @@ export const App = () => {
 
   React.useEffect(() => {
     Storage.getItemOrFail("sessionToken")
-      .then(() => setAuthenticated(true))
-      .catch(() => setAuthenticated(false));
+      .then(() => setAuthentication("user"))
+      .catch(() => setAuthentication("none"));
   }, []);
 
   return (
@@ -33,9 +33,9 @@ export const App = () => {
       >
         <ClientProvider>
           {match(authenticated)
-            .with(P.nullish, () => null)
-            .with(false, () => <AuthenticationScreen />)
-            .with(true, () => <Navigator />)
+            .with("loading", () => null)
+            .with("none", () => <AuthenticationScreen />)
+            .with("user", () => <Navigator />)
             .exhaustive()}
         </ClientProvider>
       </ErrorBoundary>
