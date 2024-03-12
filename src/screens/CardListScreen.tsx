@@ -37,9 +37,7 @@ import { isEmpty, isNotNullish, isNotNullishOrEmpty, isNullish } from "../utils/
 import { parseOperationResult, useBasicQuery } from "../utils/urql";
 
 const serviceName = Platform.OS === "ios" ? "Apple Wallet" : "Google Pay";
-
-const window = Dimensions.get("window");
-const cardWidth = window.width - 24 * 4;
+const cardWidth = Dimensions.get("window").width - 24 * 4;
 
 const styles = StyleSheet.create({
   fill: {

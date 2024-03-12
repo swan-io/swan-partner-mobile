@@ -319,7 +319,7 @@
 				CODE_SIGN_ENTITLEMENTS = Swan/Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1700068451;
+				CURRENT_PROJECT_VERSION = 1710172913;
 				DEVELOPMENT_TEAM = 6GQ3C334JL;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 6GQ3C334JL;
 				ENABLE_BITCODE = NO;
@@ -335,7 +335,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Swan\"",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -360,7 +360,7 @@
 				CODE_SIGN_ENTITLEMENTS = Swan/Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1700068451;
+				CURRENT_PROJECT_VERSION = 1710172913;
 				DEVELOPMENT_TEAM = 6GQ3C334JL;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 6GQ3C334JL;
 				ENABLE_BITCODE = NO;
@@ -376,7 +376,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Swan\"",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -462,10 +462,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"-Wl",
-					"-ld_classic",
-				);
+				OTHER_LDFLAGS = "$(inherited)";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -538,11 +535,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-Wl",
-					"-ld_classic",
-				);
+				OTHER_LDFLAGS = "$(inherited)";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
