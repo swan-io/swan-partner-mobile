@@ -7,7 +7,7 @@ A demo of a Swan integration within a native app, built with React Native.
 ## Getting started
 
 First, besure that you correctly setted up your development environment. We recommend following [this guide](https://reactnative.dev/docs/environment-setup).<br/>
-You will also need to install [yarn](https://classic.yarnpkg.com/en/docs/install#mac-stable).
+You will also need to install [pnpm 9.9.0](https://pnpm.io/installation#installing-a-specific-version).
 
 ### Clone
 
@@ -18,9 +18,9 @@ $ git clone git@github.com/swan-io/swan-partner-mobile.git
 ### Install
 
 ```bash
-$ yarn
+$ pnpm install
 $ cd ios && pod install
-$ cd ../server && yarn
+$ cd ../server && pnpm install
 ```
 
 ## Google Pay
@@ -33,13 +33,13 @@ By default, the TapAndPay SDK is not included.
 If you want to setup your android device to use the Google Pay sandbox, run:
 
 ```bash
-$ yarn android:sandbox-pay
+$ pnpm android:sandbox-pay
 ```
 
 To go back to normal, run:
 
 ```bash
-$ yarn android:live-pay
+$ pnpm android:live-pay
 ```
 
 ## Environment variables
@@ -80,14 +80,14 @@ SESSION_TOKEN_PASSWORD="" # fill this with some not random password that is at l
 To start the mobile development server, use:
 
 ```bash
-$ yarn android
+$ pnpm android
 # --- OR ---
-$ yarn ios
+$ pnpm ios
 ```
 
 You will also need to start the backend development server:
 
 ```bash
 $ cd server
-$ yarn dev
+$ pnpm dev
 ```

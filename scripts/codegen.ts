@@ -89,7 +89,7 @@ const config: CodegenConfig = {
       plugins: ["introspection"],
       config: { descriptions: false },
       hooks: {
-        afterOneFileWrite: "yarn tsx ./scripts/cleanIntrospection.ts",
+        afterOneFileWrite: "pnpm tsx ./scripts/cleanIntrospection.ts",
       },
     },
   },
