@@ -3,10 +3,10 @@
   "description": "Swan mobile app",
   "license": "MIT",
   "version": "1.2.2",
-  "private": true,
+  "packageManager": "pnpm@9.9.0",
   "engines": {
     "node": ">=20.9.0",
-    "yarn": "^1.22.0"
+    "pnpm": "9.9.0"
   },
   "repository": {
     "type": "git",
@@ -15,14 +15,14 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "postinstall": "yarn generate-env",
+    "postinstall": "pnpm generate-env",
     "android:bind": "adb reverse tcp:8081 tcp:8081",
-    "android:build-debug": "yarn android:gradle bundleDebug",
-    "android:build-release": "yarn android:gradle bundleRelease",
-    "android:clean": "yarn android:gradle clean",
+    "android:build-debug": "pnpm android:gradle bundleDebug",
+    "android:build-release": "pnpm android:gradle bundleRelease",
+    "android:clean": "pnpm android:gradle clean",
     "android:gradle": "cd android && ./gradlew",
-    "android:install-debug": "yarn android:gradle && yarn android:gradle installDebug",
-    "android:install-release": "yarn android:gradle installRelease",
+    "android:install-debug": "pnpm android:gradle && pnpm android:gradle installDebug",
+    "android:install-release": "pnpm android:gradle installRelease",
     "android:live-pay": "adb shell rm /sdcard/Download/android_pay_env_override_sandbox && adb reboot",
     "android:sandbox-pay": "adb shell touch /sdcard/Download/android_pay_env_override_sandbox && adb reboot",
     "ios:clean": "rm -rf ./ios/Pods",
@@ -32,16 +32,16 @@
     "generate-env": "tsx ./scripts/generateEnvFile.ts",
     "bump-version": "tsx ./scripts/bumpVersionCode.ts",
     "prepare": "git config --local core.hooksPath .hooks",
-    "nuke": "rm -rf node_modules && yarn android:clean && yarn ios:clean",
-    "start": "yarn generate-env && react-native start",
-    "cold-start": "yarn generate-env && react-native start --reset-cache",
+    "nuke": "rm -rf node_modules && pnpm android:clean && pnpm ios:clean",
+    "start": "pnpm generate-env && react-native start",
+    "cold-start": "pnpm generate-env && react-native start --reset-cache",
     "format": "prettier '**/*' -u -w",
     "format-locales": "tsx ./scripts/sortTranslations.ts",
-    "lint": "yarn generate-env && eslint ./src --ext ts,tsx",
-    "typecheck": "yarn generate-env && tsc --noEmit"
+    "lint": "pnpm generate-env && eslint ./src --ext ts,tsx",
+    "typecheck": "pnpm generate-env && tsc --noEmit"
   },
   "lint-staged": {
-    "src/locales/*.json": "yarn format-locales",
+    "src/locales/*.json": "pnpm format-locales",
     "*": "prettier -u -w"
   },
   "dependencies": {

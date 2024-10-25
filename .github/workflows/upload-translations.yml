@@ -12,14 +12,16 @@ jobs:
       contents: read # required for actions / checkout
       id-token: write # required for requesting the JWT
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
       - name: Install dependencies
-        run: yarn install --pure-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Push translation keys
-        run: yarn localazy upload -r ${{ secrets.LOCALAZY_MOBILE_READ_KEY }} -w ${{ secrets.LOCALAZY_MOBILE_WRITE_KEY }}
+        run: pnpm localazy upload -r ${{ secrets.LOCALAZY_MOBILE_READ_KEY }} -w ${{ secrets.LOCALAZY_MOBILE_WRITE_KEY }}
