@@ -7,12 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5A74921A07F06F77A681E23B /* libPods-Swan.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3E0C9D6F22E6C93A4F317C5 /* libPods-Swan.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		54DEFE43433EE2790FB1ADED /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1518034774B6110339C9B96F /* PrivacyInfo.xcprivacy */; };
-		FE94CF06F6D847B197F3336D /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 755769BD0C0E46EA86E2F9A0 /* Colors.xcassets */; };
+		5A74921A07F06F77A681E23B /* libPods-Swan.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3E0C9D6F22E6C93A4F317C5 /* libPods-Swan.a */; };
 		DD31EEC0287DCBA200F64485 /* RNKeyboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DD31EEB9287DCBA200F64485 /* RNKeyboardManager.m */; };
 		DD31EECC287DCCDC00F64485 /* inter_bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = DD31EEC8287DCC6900F64485 /* inter_bold.otf */; };
 		DD31EECD287DCCDE00F64485 /* inter_medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = DD31EEC6287DCC6900F64485 /* inter_medium.otf */; };
@@ -22,6 +21,7 @@
 		DD64393A28BF6280002C1262 /* RNApplePayButtonManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DD64393928BF6280002C1262 /* RNApplePayButtonManager.m */; };
 		DD64393D28BF6F4C002C1262 /* RNWallet.m in Sources */ = {isa = PBXBuildFile; fileRef = DD64393C28BF6F4C002C1262 /* RNWallet.m */; };
 		DD7D5F2528A15484007E77EC /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DD7D5F2428A15484007E77EC /* BootSplash.storyboard */; };
+		FE94CF06F6D847B197F3336D /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 755769BD0C0E46EA86E2F9A0 /* Colors.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,8 +32,10 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Swan/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Swan/main.m; sourceTree = "<group>"; };
 		1518034774B6110339C9B96F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Swan/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		A3E0C9D6F22E6C93A4F317C5 /* libPods-Swan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Swan.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BAA2EAFAAA7C29D77DF29E5 /* Pods-Swan.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Swan.release.xcconfig"; path = "Target Support Files/Pods-Swan/Pods-Swan.release.xcconfig"; sourceTree = "<group>"; };
+		44D944D7A73EBD92CAA5F9EF /* Pods-Swan.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Swan.debug.xcconfig"; path = "Target Support Files/Pods-Swan/Pods-Swan.debug.xcconfig"; sourceTree = "<group>"; };
 		755769BD0C0E46EA86E2F9A0 /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = Swan/Colors.xcassets; sourceTree = "<group>"; };
+		A3E0C9D6F22E6C93A4F317C5 /* libPods-Swan.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Swan.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD31EEB6287DCBA200F64485 /* RNKeyboardManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RNKeyboardManager.h; path = Modules/RNKeyboardManager.h; sourceTree = "<group>"; };
 		DD31EEB9287DCBA200F64485 /* RNKeyboardManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNKeyboardManager.m; path = Modules/RNKeyboardManager.m; sourceTree = "<group>"; };
 		DD31EEC6287DCC6900F64485 /* inter_medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = inter_medium.otf; path = ../android/app/src/main/res/font/inter_medium.otf; sourceTree = "<group>"; };
@@ -49,8 +51,6 @@
 		DD64393F28BFC287002C1262 /* RNApplePayButtonView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNApplePayButtonView.h; path = Modules/RNApplePayButtonView.h; sourceTree = "<group>"; };
 		DD7D5F2428A15484007E77EC /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = Swan/BootSplash.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		44D944D7A73EBD92CAA5F9EF /* Pods-Swan.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Swan.debug.xcconfig"; path = "Target Support Files/Pods-Swan/Pods-Swan.debug.xcconfig"; sourceTree = "<group>"; };
-		1BAA2EAFAAA7C29D77DF29E5 /* Pods-Swan.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Swan.release.xcconfig"; path = "Target Support Files/Pods-Swan/Pods-Swan.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
