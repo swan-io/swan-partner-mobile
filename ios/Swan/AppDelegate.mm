@@ -18,10 +18,10 @@
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
-  return [self getBundleURL];
+  return [self bundleURL];
 }
 
-- (NSURL *)getBundleURL
+- (NSURL *)bundleURL
 {
 #if DEBUG
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
@@ -30,20 +30,20 @@
 #endif
 }
 
-- (UIView *)createRootViewWithBridge:(RCTBridge *)bridge moduleName:(NSString *)moduleName initProps:(NSDictionary *)initProps
-{
-  UIView *rootView = [super createRootViewWithBridge:bridge moduleName:moduleName initProps:initProps];
+- (void)customizeRootView:(RCTRootView *)rootView {
+  [super customizeRootView:rootView];
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
-  return rootView;
 }
 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
-{
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
   return [RCTLinkingManager application:application openURL:url options:options];
 }
 
-- (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)activity restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))handler
-{
+- (BOOL)application:(UIApplication *)application
+continueUserActivity:(nonnull NSUserActivity *)activity
+ restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))handler {
   return [RCTLinkingManager application:application continueUserActivity:activity restorationHandler:handler];
 }
 

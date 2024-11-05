@@ -29,9 +29,11 @@ export const NavigationContainer = ({ children }: Props) => {
 
     void BootSplash.hide({ fade: true }).then(() => {
       // A weird issue occurs on Android 12+ on app restart
-      Platform.OS !== "android" || Platform.Version < 12
-        ? setSystemBarStyles()
-        : setTimeout(setSystemBarStyles, 500);
+      if (Platform.OS !== "android" || Platform.Version < 12) {
+        setSystemBarStyles();
+      } else {
+        setTimeout(setSystemBarStyles, 500);
+      }
     });
   }, []);
 

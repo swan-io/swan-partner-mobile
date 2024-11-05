@@ -39,7 +39,9 @@ export const LoadingView = ({ edges }: Props) => {
     let mounted = true;
 
     setTimeout(() => {
-      mounted && setVisible(true);
+      if (mounted) {
+        setVisible(true);
+      }
     }, 500);
 
     return () => {

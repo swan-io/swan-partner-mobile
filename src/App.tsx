@@ -27,10 +27,7 @@ export const App = () => {
 
   return (
     <SafeAreaProvider>
-      <ErrorBoundary
-        ref={errorBoundaryRef}
-        fallbackRender={({ error }: { error?: Error }) => <ErrorView error={error} />}
-      >
+      <ErrorBoundary ref={errorBoundaryRef} fallbackRender={() => <ErrorView />}>
         <ClientProvider>
           {match(authenticated)
             .with("loading", () => null)

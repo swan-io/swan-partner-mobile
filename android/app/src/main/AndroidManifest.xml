@@ -1,5 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -8,8 +7,8 @@
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="false"
-        android:theme="@style/BootTheme">
-
+        android:theme="@style/BootTheme"
+        android:supportsRtl="true">
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
@@ -18,18 +17,20 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:resizeableActivity="false"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/BootTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- https://developer.android.com/training/app-links/deep-linking -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="io.swan.id" android:host="callback" />
+                <data
+                    android:scheme="io.swan.id"
+                    android:host="callback" />
             </intent-filter>
         </activity>
     </application>
