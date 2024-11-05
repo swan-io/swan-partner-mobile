@@ -16,8 +16,8 @@ import { env } from "../utils/env";
 import { t } from "../utils/i18n";
 import { isNotNullish } from "../utils/nullish";
 
-const LOGO = require("../assets/bootsplash_logo.png") as ImageRequireSource;
-const MANIFEST = require("../assets/bootsplash_manifest.json") as Manifest;
+const LOGO = require("../assets/bootsplash/logo.png") as ImageRequireSource;
+const MANIFEST = require("../assets/bootsplash/manifest.json") as Manifest;
 
 const hasSessionToken = isMatching({
   sessionToken: P.string,
@@ -57,9 +57,11 @@ export const AuthenticationScreen = () => {
       };
 
       // A weird issue occurs on Android 12+ on app restart
-      Platform.OS !== "android" || Platform.Version < 12
-        ? setSystemBarStyles()
-        : setTimeout(setSystemBarStyles, 500);
+      if (Platform.OS !== "android" || Platform.Version < 12) {
+        setSystemBarStyles();
+      } else {
+        setTimeout(setSystemBarStyles, 500);
+      }
 
       Animated.spring(translateY, {
         toValue: 1,

@@ -58,6 +58,8 @@ module.exports = {
       },
 
       rules: {
+        "@typescript-eslint/no-require-imports": "off",
+
         "react/jsx-boolean-value": ["error", "always"],
 
         "react-hooks/rules-of-hooks": "error",

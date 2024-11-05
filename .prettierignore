@@ -1,5 +1,6 @@
 node_modules/
 Pods/
+pnpm-lock.yaml
 android/app/build/
 ios/build/
 server/dist

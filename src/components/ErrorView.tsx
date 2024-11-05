@@ -19,11 +19,7 @@ const styles = StyleSheet.create({
   },
 });
 
-type Props = {
-  error?: Error;
-};
-
-export const ErrorView = (_props: Props) => {
+export const ErrorView = () => {
   const handleOnLogout = React.useCallback(() => {
     void logout();
   }, []);
