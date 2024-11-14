@@ -7,7 +7,7 @@ A demo of a Swan integration within a native app, built with React Native.
 ## Getting started
 
 First, besure that you correctly setted up your development environment. We recommend following [this guide](https://reactnative.dev/docs/environment-setup).<br/>
-You will also need to install [pnpm 9.9.0](https://pnpm.io/installation#installing-a-specific-version).
+You will also need to install [pnpm](https://pnpm.io/installation).
 
 ### Clone
 
